@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Locksmith — Registrar Security Workshop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --rudy:#aa0000;
+    --ink:#16202E;
+    --ink-soft:#2A3646;
+    --paper:#F4F1E9;
+    --card:#FBFAF6;
+    --line:#D9D2C4;
+    --muted:#6C7480;
+    --danger:#C63A2F;
+    --danger-bg:#FBEAE7;
+    --safe:#2E7D5B;
+    --safe-bg:#E6F1EB;
+    --amber:#C77D1A;
+    --amber-bg:#FaF0DC;
+    --shadow:0 1px 2px rgba(22,32,46,.06),0 6px 20px rgba(22,32,46,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{font-family:'Helvetica',sans-serif;letter-spacing:-.01em}
+  .mono{font-family:'Helvetica',monospace}
+
+  /* ---- header ---- */
+  header{
+    border-bottom:1px solid var(--line);
+    background:var(--rudy);color:var(--paper);
+    padding:26px 24px 22px;
+  }
+  .head-inner{max-width:1040px;margin:0 auto}
+  .eyebrow{
+    font-family:'Helvetica',monospace;font-size:14px;letter-spacing:.18em;
+    text-transform:uppercase;color:#ffffff;margin:0 0 8px;
+  }
+  header h1{font-size:clamp(28px,5vw,44px);margin:0;font-weight:700;line-height:1.05}
+  header p{margin:10px 0 0;color:#ffffff;max-width:60ch;font-size:15px}
+  .lock{display:inline-block;transform:translateY(2px);margin-right:10px}
+
+  /* ---- tabs ---- */
+  nav.tabs{
+    position:sticky;top:0;z-index:20;background:var(--paper);
+    border-bottom:1px solid var(--line);
+    display:flex;gap:2px;padding:0 16px;max-width:1040px;margin:0 auto;
+    overflow-x:auto;
+  }
+  .tab{
+    appearance:none;border:0;background:none;cursor:pointer;
+    font-family:'Helvetica',sans-serif;font-weight:600;font-size:15px;
+    color:var(--muted);padding:15px 16px;border-bottom:3px solid transparent;
+    white-space:nowrap;transition:color .15s;
+  }
+  .tab:hover{color:var(--ink)}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--danger)}
+  .tab .n{font-family:'Helvetica',monospace;font-size:12px;color:var(--danger);margin-right:7px}
+
+  main{max-width:1040px;margin:0 auto;padding:28px 20px 80px}
+  .panel{display:none;animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .lede{font-size:17px;color:var(--ink-soft);max-width:64ch;margin:0 0 26px}
+  section.block{margin-bottom:34px}
+  .kicker{
+    font-family:'Helvetica',monospace;font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--danger);margin:0 0 6px;
+  }
+  h2.blocktitle{font-size:24px;margin:0 0 14px}
+
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:22px;box-shadow:var(--shadow);
+  }
+
+  /* ---- password lab ---- */
+  .pw-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .pw-input{
+    flex:1;min-width:240px;font-family:'Helvetica',monospace;font-size:18px;
+    padding:14px 16px;border:2px solid var(--line);border-radius:10px;background:#fff;
+    color:var(--ink);transition:border-color .15s;
+  }
+  .pw-input:focus{outline:none;border-color:var(--ink)}
+  .btn{
+    font-family:'Helvetica',sans-serif;font-weight:600;font-size:15px;cursor:pointer;
+    border:2px solid var(--ink);background:var(--ink);color:var(--paper);
+    padding:13px 20px;border-radius:10px;transition:transform .08s,background .15s;
+  }
+  .btn:hover{background:var(--ink-soft)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:none;color:var(--ink)}
+  .btn.ghost:hover{background:rgba(22,32,46,.06)}
+  .toggle-see{
+    font-family:'Helvetica',monospace;font-size:12px;color:var(--muted);
+    background:none;border:0;cursor:pointer;text-decoration:underline;padding:6px;
+  }
+
+  .meter{height:12px;border-radius:20px;background:#E7E1D4;overflow:hidden;margin:18px 0 6px}
+  .meter-fill{height:100%;width:0;border-radius:20px;transition:width .4s ease,background .4s ease}
+  .meter-label{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;color:var(--muted)}
+  .verdict{font-family:'Helvetica';font-weight:700;font-size:15px}
+
+  .crack-readout{
+    display:flex;gap:18px;flex-wrap:wrap;margin-top:20px;
+  }
+  .stat{
+    flex:1;min-width:150px;background:#fff;border:1px solid var(--line);
+    border-radius:10px;padding:14px 16px;
+  }
+  .stat .lbl{font-family:'Helvetica',monospace;font-size:11px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .stat .val{font-family:'Helvetica',monospace;font-size:20px;font-weight:700}
+
+  .feedback{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+  .fb{display:flex;gap:10px;align-items:flex-start;font-size:14px;padding:8px 12px;border-radius:8px}
+  .fb.warn{background:var(--amber-bg)}
+  .fb.good{background:var(--safe-bg)}
+  .fb.bad{background:var(--danger-bg)}
+  .fb .ic{font-family:'Helvetica';font-weight:700;flex-shrink:0}
+  .fb.warn .ic{color:var(--amber)}
+  .fb.good .ic{color:var(--safe)}
+  .fb.bad .ic{color:var(--danger)}
+
+  /* ---- attacker console ---- */
+  .console{
+    margin-top:14px;background:#0E1720;border:1px solid #26333f;border-radius:12px;
+    padding:18px;font-family:'Helvetica',monospace;color:#8FE3B0;
+    box-shadow:inset 0 0 30px rgba(0,0,0,.4);
+  }
+  .console-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .console-title{color:#5C6F80;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+  .dots{display:flex;gap:6px}
+  .dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .console-stream{font-size:14px;min-height:26px;color:#C7B8FF;letter-spacing:.05em;word-break:break-all}
+  .console-meta{display:flex;gap:20px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:#7C8A98}
+  .console-meta b{color:#EBF2F7}
+  .console-result{margin-top:14px;font-size:16px;font-weight:700;min-height:22px}
+  .console-result.cracked{color:#FF6B5E}
+  .console-result.safe{color:#6FE3A5}
+
+  /* ---- demo accounts ---- */
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  th{font-family:'Helvetica';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  td.pw{font-family:'Helvetica'}
+  .pill{display:inline-block;font-family:'Helvetica';font-size:12px;font-weight:700;
+    padding:3px 9px;border-radius:20px}
+  .pill.instant{background:var(--danger-bg);color:var(--danger)}
+  .pill.weak{background:var(--amber-bg);color:var(--amber)}
+  .pill.ok{background:var(--safe-bg);color:var(--safe)}
+
+  /* ---- phishing inbox ---- */
+  .inbox-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:18px}
+  .score{font-family:'Helvetica';font-weight:700;font-size:15px;background:var(--card);
+    border:1px solid var(--line);border-radius:10px;padding:10px 16px}
+  .email{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);
+  }
+  .email-meta{padding:16px 18px;border-bottom:1px solid var(--line)}
+  .email-from{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+  .email-name{font-weight:600}
+  .email-addr{font-family:'Helvetica';font-size:12.5px;color:var(--muted)}
+  .email-subj{font-family:'Helvetica';font-weight:600;font-size:16px;margin-top:6px}
+  .email-body{padding:16px 18px;font-size:14.5px;color:var(--ink-soft);white-space:pre-line}
+  .email-body .link{color:#2563C9;text-decoration:underline;font-family:'Helvetica';font-size:13px}
+  .email-actions{display:flex;gap:10px;padding:0 18px 18px;flex-wrap:wrap}
+  .choice{
+    font-family:'Helvetica';font-weight:600;font-size:14px;cursor:pointer;
+    border:2px solid var(--line);background:#fff;color:var(--ink);
+    padding:10px 18px;border-radius:9px;transition:all .12s;
+  }
+  .choice:hover{border-color:var(--ink)}
+  .choice.pick-phish:hover{border-color:var(--danger);color:var(--danger)}
+  .choice.pick-legit:hover{border-color:var(--safe);color:var(--safe)}
+  .choice:disabled{cursor:default;opacity:.5}
+  .choice.chosen-correct{background:var(--safe);border-color:var(--safe);color:#fff;opacity:1}
+  .choice.chosen-wrong{background:var(--danger);border-color:var(--danger);color:#fff;opacity:1}
+  .reveal{padding:0 18px 18px;display:none}
+  .reveal.show{display:block}
+  .reveal-inner{border-radius:10px;padding:14px 16px;font-size:14px}
+  .reveal-inner.is-phish{background:var(--danger-bg)}
+  .reveal-inner.is-legit{background:var(--safe-bg)}
+  .reveal-verdict{font-family:'Helvetica';font-weight:700;margin-bottom:6px}
+  .reveal-inner.is-phish .reveal-verdict{color:var(--danger)}
+  .reveal-inner.is-legit .reveal-verdict{color:var(--safe)}
+  .flags{margin:8px 0 0;padding-left:18px}
+  .flags li{margin-bottom:4px}
+
+  /* ---- blast radius ---- */
+  .blast-stage{width:100%;overflow:hidden}
+  #blastSvg{width:100%;height:auto;display:block}
+  .edge{stroke:#D9D2C4;stroke-width:2.5;transition:stroke .5s,stroke-width .5s}
+  .edge.hot{stroke:var(--danger);stroke-width:3.5}
+  .node-box{transition:opacity .4s}
+  .node-rect{fill:#fff;stroke:#CDC6B8;stroke-width:1.5;transition:fill .5s,stroke .5s}
+  .node-box.safe .node-rect{fill:var(--safe-bg);stroke:#9FCBB6}
+  .node-box.hot .node-rect{fill:var(--danger-bg);stroke:var(--danger);stroke-width:2.5}
+  .node-box.pending .node-rect{fill:#F3EFE6;stroke:#DDD6C8;stroke-dasharray:4 3}
+  .node-label{font-family:'Helvetica',sans-serif;font-weight:600;fill:var(--ink);font-size:13px}
+  .node-sub{font-family:'Helvetica',monospace;fill:var(--muted);font-size:10px}
+  .node-box.hot .node-icon{fill:var(--danger)}
+  .node-box.safe .node-icon{fill:var(--safe)}
+  .node-icon{fill:#B4AC9C;font-family:'Helvetica';font-weight:700;font-size:13px}
+  .blast-controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:16px}
+  .blast-dots{display:flex;gap:7px;margin-left:auto}
+  .blast-dots i{width:10px;height:10px;border-radius:50%;background:#D9D2C4;display:block;transition:background .3s}
+  .blast-dots i.done{background:var(--danger)}
+  .blast-dots i.current{background:var(--danger);box-shadow:0 0 0 3px var(--danger-bg)}
+  .blast-explain{border-left:4px solid var(--danger)}
+  .blast-source{background:var(--danger-bg);border-radius:8px;padding:10px 14px;font-size:13px;color:#7a271f}
+  .blast-source b{font-family:'Helvetica';font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+  .blast-explain.safe-state{border-left-color:var(--safe)}
+
+  .callout{
+    background:var(--ink);color:var(--paper);border-radius:14px;padding:22px 24px;margin-top:10px;
+  }
+  .callout h3{margin:0 0 10px;font-size:19px}
+  .callout ul{margin:0;padding-left:20px;color:#ffffff}
+  .callout li{margin-bottom:7px}
+
+  .facil{border-left:3px solid var(--amber);background:var(--amber-bg);padding:12px 16px;
+    border-radius:0 8px 8px 0;font-size:13.5px;margin-top:16px;color:#6a4a12}
+  .facil b{font-family:'Helvetica';font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+
+  .foot{text-align:center;color:var(--muted);font-size:12.5px;margin-top:40px;font-family:'Helvetica'}
+
+  @media (max-width:560px){
+    .stat{min-width:calc(50% - 9px)}
+    header{padding:20px 18px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="head-inner">
+    <p class="eyebrow">Office of the Registrar</p>
+    <h1>Information Security</h1>
+    <p>A hands-on workshop for building better security habits. Test how long your passwords would survive an attack, and learn to spot the emails designed to fool you. Everything here is a simulation.</p>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist" aria-label="Workshop sections">
+  <button class="tab" role="tab" aria-selected="true" aria-controls="p-intro" id="t-intro">Start Here</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-passinfo" id="t-passinfo">Cryptography</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-pw" id="t-pw">Password Lab</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-phish" id="t-phish">Phishing Inbox</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-blast" id="t-blast">Blast Radius</button>
+  <button class="tab" role="tab" aria-selected="false" aria-controls="p-recap" id="t-recap">Takeaways</button>
+</nav>
+
+<main>
+  <!-- INTRO -->
+  <div class="panel" id="p-intro" role="tabpanel" aria-labelledby="t-intro">
+    <p class="lede">Most breaches don't start with a genius hacker. They start with a reused password or one clicked link. This session has two labs and an informational section; work through them as a group.</p>
+    <section class="block">
+      <div class="card">
+        <h2 class="blocktitle">Labs</h2>
+        <div style="display:flex;gap:22px;flex-wrap:wrap">
+          <div style="flex:1;min-width:240px">
+            <p class="kicker">Lab 1</p>
+            <h3 style="margin:0 0 6px">Passwords</h3>
+            <p style="margin:0;color:var(--ink-soft);font-size:14.5px">Type a sample password and watch a simulated attacker try to crack it in real time. See why length beats complexity, and how reused passwords fall instantly.</p>
+          </div>
+          <div style="flex:1;min-width:240px">
+            <p class="kicker">Lab 2</p>
+            <h3 style="margin:0 0 6px">Emails</h3>
+            <p style="margin:0;color:var(--ink-soft);font-size:14.5px">Triage emails styled after real messages that could come to your inbox. Flag each as safe or a scam, then see the tells you might have missed.</p>
+          </div>
+        </div>
+        <!-- <div class="facil"><b>Facilitator note</b><br>Give the room 2 minutes on the Password Lab intro before revealing the brute-force demo together on the projector. It lands hardest as a shared "oh no" moment.</div> -->
+      </div>
+    </section>
+    <section class="block">
+      <div class="card">
+        <h2 class="blocktitle">Ground rules</h2>
+        <div class="feedback">
+          <div class="fb good"><span class="ic">✓</span><span><b>Use fake passwords.</b> Never type a password you actually use, here or anywhere you're asked to "test" it. Make something up.</span></div>
+          <div class="fb good"><span class="ic">✓</span><span><b>Nothing is stored.</b> This page runs entirely in your browser. Close the tab and it's gone.</span></div>
+          <div class="fb warn"><span class="ic">!</span><span><b>The crack times are estimates.</b> They assume a fast offline attack (~100 billion guesses/second). Real conditions vary, but the comparisons hold.</span></div>
+        </div>
+        <div style="margin-top:20px"><button class="btn" onclick="showTab('passinfo')">Start →</button></div>
+      </div>
+    </section>
+  </div>
+  <!-- Passwords Information -->
+  <div class="panel active" id="p-passinfo" role="tabpanel" aria-labelledby="t-passinfo">
+    <p class="kicker">Information</p>
+    <h2 class="blocktitle" style="font-size:28px">Passwords: It's (Almost) All Math</h2>
+    <section class="block">
+      <!-- <div class="callout" style="background-color: var(--rudy);"> -->
+        <p>A password of any given length (<b><mi>L</mi></b>) built using a character set of size (<b><mi>N</mi></b> - which represents complexity) creates a combination of posibilities where: 
+          <br>
+          <br>
+          <math display="block">
+            <mi>Possible Combinations</mi>
+            <mo>=</mo>
+            <msup>
+            <mi>N</mi>
+            <mi>L</mi>
+            </msup>
+            </math>
+            <br>
+          As the English alphabet contains 26 characters, if we have a password length of 8 alphabetical characters (only including lowercase letters) then the complexity becomes:
+           <br>
+           <br>
+          <math display="block">
+            <mi>Possible Combinations</mi>
+            <mo>=</mo>
+            <msup>
+            <mi>26</mi>
+            <mi>8</mi>
+            </msup>
+            <mo>=</mo>
+            <mi>208,827,064,576</mi>
+            </math>
+            <br>
+          The mathematical expression explains why password <i>length</i> and not simply <i>complexity</i> make the biggest impact. Complexity is the base and password length is the exponent. 
+          <br><br>
+          The following table exemplifies how simply changing complexity will affect the possible combinations for a password with a length of 8 characters:
+          <br>
+          <table>
+          <!-- Row 1: Headers -->
+          <tr>
+            <th>Characters (Length = 8)</th>
+            <th>Complexity (N)</th>
+            <th>Possible Combinations</th>
+            <th></th>
+          </tr>
+          <!-- Row 2: Data -->
+          <tr>
+            <td>Lowercase letters only</td>
+            <td>26</td>
+            <td>208,827,064,576</td>
+          </tr>
+          <tr>
+            <td>Lowercase letters + Uppercase letters</td>
+            <td>52</td>
+            <td>53,459,728,531,456</td>
+          </tr>
+          <tr>
+            <td>Lowercase + Uppercase letters + Numbers</td>
+            <td>62</td>
+            <td>218,340,105,584,896</td>
+          </tr>
+          <tr>
+            <td>All letters + Numbers + Special Characters</td>
+            <td>~95</td>
+            <td>6,634,204,312,890,625</td>
+          </tr>
+        </table>
+        <br>
+        The addition of complexity does cause the number of possibilities to increase, however, not to the same magnitude as when we increase the length of the password:
+        <br><br>
+          <table>
+          <!-- Row 1: Headers -->
+          <tr>
+            <th>Characters (Lowercase only)</th>
+            <th>Possible Combinations</th>
+          </tr>
+          <!-- Row 2: Data -->
+          <tr>
+            <td>8</td>
+            <td>208,827,064,576</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td>141,167,095,653,376</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td>95,428,956,661,682,176</td>
+          </tr>
+          <tr>
+            <td>16</td>
+            <td>43,608,742,899,428,874,059,776</td>
+          </tr>
+        </table>
+        </p>
+      </div>
+    </section>
+    <section class="block">
+
+    </section>
+    </div>
+  <!-- PASSWORD LAB -->
+  <div class="panel" id="p-pw" role="tabpanel" aria-labelledby="t-pw">
+    <p class="kicker">Lab 1</p>
+    <h2 class="blocktitle" style="font-size:28px">Password Lab</h2>
+    <p class="lede">Type a made-up password below. The meter updates as you type. When you're ready, run the attacker simulation.</p>
+
+    <section class="block">
+      <div class="card">
+        <div class="pw-row">
+          <input class="pw-input" id="pwField" type="text" spellcheck="false" autocomplete="off"
+                 placeholder="type a sample password…" aria-label="Sample password to test">
+          <button class="btn ghost toggle-note" style="border:2px solid var(--line)" onclick="fillExample()">Try an example</button>
+        </div>
+
+        <div class="meter" aria-hidden="true"><div class="meter-fill" id="meterFill"></div></div>
+        <div class="meter-label">
+          <span class="verdict" id="verdict">Waiting…</span>
+          <span id="entropyTxt" class="mono"></span>
+        </div>
+
+        <div class="crack-readout">
+          <div class="stat">
+            <div class="lbl">Length</div>
+            <div class="val" id="statLen">0</div>
+          </div>
+          <div class="stat">
+            <div class="lbl">Character sets</div>
+            <div class="val" id="statSets">0/4</div>
+          </div>
+          <div class="stat">
+            <div class="lbl">Est. time to crack</div>
+            <div class="val" id="statTime" style="color:var(--muted)">—</div>
+          </div>
+        </div>
+
+        <div class="feedback" id="pwFeedback"></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px">
+          <h3 style="margin:0;font-size:19px">Attacker simulation</h3>
+          <button class="btn" id="runBtn" onclick="runAttack()">▶ Run brute-force attack</button>
+        </div>
+        <p style="margin:6px 0 0;color:var(--muted);font-size:14px">A visual of an attacker guessing, throttled so you can watch. Weak passwords fall in the blink of an eye. Strong ones stall the machine for longer than the universe has existed.</p>
+        <div class="console" aria-live="polite">
+          <div class="console-top">
+            <span class="console-title">guess_engine // offline attack</span>
+            <span class="dots"><i style="background:#FF6B5E"></i><i style="background:#F5C451"></i><i style="background:#6FE3A5"></i></span>
+          </div>
+          <div class="console-stream mono" id="stream">idle — enter a password and press run</div>
+          <div class="console-meta">
+            <span>attempts: <b id="attempts">0</b></span>
+            <span>rate: <b>~100B/sec</b></span>
+            <span>elapsed: <b id="elapsed">0.0s</b></span>
+          </div>
+          <div class="console-result" id="attackResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="kicker">Compare</p>
+      <h3 style="margin:0 0 4px;font-size:19px">How common staff passwords hold up</h3>
+      <p style="margin:0 0 14px;color:var(--muted);font-size:14px">Dummy accounts with the kinds of passwords people actually pick. Notice what "adding a number and a capital" really buys you.</p>
+      <div class="card" style="padding:6px 8px">
+        <table>
+          <thead><tr><th>Account (demo)</th><th>Password</th><th>Why it's tempting</th><th>Time to crack</th></tr></thead>
+          <tbody id="demoRows"></tbody>
+        </table>
+      </div>
+      <div class="facil"><b>Discussion prompt</b><br>Ask the room: how many of these patterns look familiar? The point isn't shame — it's that attackers know these patterns too, and try them first.</div>
+    </section>
+    <div><button class="btn" onclick="showTab('phish')">Continue to Lab 2 →</button></div>
+  </div>
+
+  <!-- PHISHING -->
+  <div class="panel" id="p-phish" role="tabpanel" aria-labelledby="t-phish">
+    <p class="kicker">Lab 2</p>
+    <h2 class="blocktitle" style="font-size:28px">Phishing Inbox</h2>
+    <p class="lede">Eight messages have landed in the shared inbox. For each one, decide: is it safe to act on, or is it a scam? You'll see the verdict and the red flags after you choose.</p>
+    <div class="inbox-head">
+      <span class="score" id="phishScore">Score: 0 / 8 reviewed</span>
+      <button class="btn ghost" style="border:2px solid var(--line)" onclick="resetPhish()">Reset inbox</button>
+    </div>
+    <div id="inbox"></div>
+    <div style="margin-top:10px"><button class="btn" onclick="showTab('blast')">See the blast radius →</button></div>
+  </div>
+
+  <!-- BLAST RADIUS -->
+  <div class="panel" id="p-blast" role="tabpanel" aria-labelledby="t-blast">
+    <p class="kicker">Lab 3</p>
+    <h2 class="blocktitle" style="font-size:28px">Blast Radius</h2>
+    <p class="lede">A breach rarely stops with one person. Watch how a single compromised coworker becomes everyone's problem — one hop at a time. Every step below maps to a real, documented incident.</p>
+
+    <section class="block">
+      <div class="card">
+        <div class="blast-stage">
+          <svg viewBox="0 0 720 470" id="blastSvg" role="img" aria-label="Diagram showing how one compromised account spreads through an office">
+            <!-- edges -->
+            <g id="blastEdges" stroke-linecap="round" fill="none">
+              <line class="edge" data-edge="e-ab" x1="150" y1="235" x2="300" y2="120"/>
+              <line class="edge" data-edge="e-ac" x1="150" y1="235" x2="300" y2="355"/>
+              <line class="edge" data-edge="e-bd" x1="360" y1="120" x2="520" y2="95"/>
+              <line class="edge" data-edge="e-cd" x1="360" y1="355" x2="520" y2="95"/>
+              <line class="edge" data-edge="e-be" x1="360" y1="120" x2="520" y2="235"/>
+              <line class="edge" data-edge="e-ce" x1="360" y1="355" x2="520" y2="235"/>
+              <line class="edge" data-edge="e-df" x1="580" y1="95"  x2="600" y2="360"/>
+              <line class="edge" data-edge="e-ef" x1="580" y1="235" x2="600" y2="360"/>
+            </g>
+            <!-- nodes -->
+            <g id="blastNodes"></g>
+          </svg>
+        </div>
+        <div class="blast-controls">
+          <button class="btn" id="blastNext" onclick="blastNext()">▶ Trace the first hop</button>
+          <button class="btn ghost" style="border:2px solid var(--line)" onclick="blastReset()">Reset</button>
+          <div class="blast-dots" id="blastDots" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block">
+      <div class="card blast-explain" id="blastExplain">
+        <p class="kicker" id="blastStepKicker">Step 0 · Before the click</p>
+        <h3 id="blastStepTitle" style="margin:0 0 8px;font-size:20px">One ordinary account, one ordinary day</h3>
+        <p id="blastStepBody" style="margin:0 0 12px;color:var(--ink-soft);font-size:15px">Everyone in the office has legitimate access to something — an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button above to trace what happens after one coworker clicks the wrong link.</p>
+        <div class="blast-source" id="blastStepSource" style="display:none"></div>
+      </div>
+    </section>
+
+    <section class="block">
+      <p class="kicker">The numbers behind this</p>
+      <h3 style="margin:0 0 4px;font-size:19px">Why this isn't hypothetical</h3>
+      <p style="margin:0 0 14px;color:var(--muted);font-size:14px">Reported figures from the FBI's 2024 Internet Crime Report (released April 2025) and documented 2024–2025 university breaches.</p>
+      <div class="crack-readout">
+        <div class="stat"><div class="lbl">2024 cybercrime losses (FBI IC3)</div><div class="val" style="color:var(--danger)">$16.6B</div></div>
+        <div class="stat"><div class="lbl">Business email compromise losses</div><div class="val" style="color:var(--danger)">$2.77B</div></div>
+        <div class="stat"><div class="lbl">Phishing complaints, most-reported crime</div><div class="val">193,407</div></div>
+      </div>
+      <div class="facil"><b>Discussion prompt</b><br>Ask: whose access, in this office, would an attacker most want? The answer is usually "whoever has the student records and the payment approvals" — which may be the person who feels least like a target.</div>
+    </section>
+
+    <section class="block">
+      <div class="card" style="padding:16px 20px">
+        <p class="kicker" style="margin-bottom:8px">Sources</p>
+        <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.7">
+          <li>FBI Internet Crime Complaint Center (IC3), 2024 Internet Crime Report, released April 23, 2025 — total losses, BEC losses, phishing complaint counts.</li>
+          <li>UNC School of Medicine data security notice — Feb. 2024 account compromise via a phishing link from a trusted contact and a shared MFA code.</li>
+          <li>PowerSchool breach (disclosed late 2024/2025) — subcontractor credentials used to reach a support portal serving tens of millions of student records.</li>
+          <li>Princeton University Advancement breach — Nov. 10, 2025, one phished employee with routine database access; alumni, donor, and student data exposed.</li>
+          <li>Columbia University breach (2025) — data of roughly 870,000 people, including Social Security numbers, exposed.</li>
+        </ul>
+      </div>
+    </section>
+    <div style="margin-top:6px"><button class="btn" onclick="showTab('recap')">See takeaways →</button></div>
+  </div>
+
+  <!-- RECAP -->
+  <div class="panel" id="p-recap" role="tabpanel" aria-labelledby="t-recap">
+    <p class="kicker">Lab 3</p>
+    <h2 class="blocktitle" style="font-size:28px">What to carry out the door</h2>
+    <section class="block">
+      <div class="callout" style="background-color: var(--rudy);">
+        <h3>Passwords</h3>
+        <ul>
+          <li><b>Length wins.</b> A long passphrase of ordinary words beats a short string of symbols. Aim for 16+ characters.</li>
+          <li><b>Never reuse.</b> One breached site shouldn't unlock the rest of your life. A password manager makes unique passwords effortless.</li>
+          <li><b>Turn on multi-factor authentication.</b> Even a cracked password is useless without the second factor.</li>
+          <li><b>Don't build passwords from public facts</b> — names, mascots, the current year, the season. Attackers guess these first.</li>
+        </ul>
+      </div>
+    </section>
+    <section class="block">
+      <div class="callout" style="background:var(--rudy)">
+        <h3>Email &amp; phishing</h3>
+        <ul>
+          <li><b>Check the actual sender address</b>, not just the display name. Hover before you trust.</li>
+          <li><b>Urgency is a weapon.</b> "Act now or lose access" is designed to stop you thinking. Slow down.</li>
+          <li><b>Hover over links</b> to see where they really go. When in doubt, navigate to the site yourself instead of clicking.</li>
+          <li><b>Verify money and data requests</b> through a second channel — a phone call, an in-person check especially if the "sender" is a supervisor.</li>
+          <li><b>Report, don't just delete.</b> Forwarding a phish to IT protects the colleague who gets it next.</li>
+        </ul>
+      </div>
+    </section>
+    <div class="facil"><b>Close the session</b><br>Have each person name one habit they'll change this week. Saying it out loud makes it stick.</div>
+    <p class="foot">Locksmith · a workshop prop · no data leaves this browser</p>
+  </div>
+</main>
+
+<script>
+/* ---------------- tab switching ---------------- */
+const tabs=[...document.querySelectorAll('.tab')];
+function showTab(key){
+  const map={intro:'p-intro',passinfo:'p-passinfo',pw:'p-pw',phish:'p-phish',blast:'p-blast',recap:'p-recap'};
+  const panelId=map[key];
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===panelId));
+  tabs.forEach(t=>{const on=t.getAttribute('aria-controls')===panelId;t.setAttribute('aria-selected',on);});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  const key=t.id.replace('t-','');showTab(key);
+}));
+
+/* ---------------- password analysis ---------------- */
+const COMMON=new Set(['password','password1','password123','123456','12345678','qwerty','letmein',
+  'welcome','admin','iloveyou','abc123','football','monkey','dragon','sunshine','princess',
+  'spring2024','summer2024','fall2024','winter2024','registrar','husky','huskies','seattle']);
+
+function analyze(pw){
+  let pool=0;
+  if(/[a-z]/.test(pw))pool+=26;
+  if(/[A-Z]/.test(pw))pool+=26;
+  if(/[0-9]/.test(pw))pool+=10;
+  if(/[^A-Za-z0-9]/.test(pw))pool+=32;
+  const sets=[/[a-z]/,/[A-Z]/,/[0-9]/,/[^A-Za-z0-9]/].filter(r=>r.test(pw)).length;
+  const lower=pw.toLowerCase().replace(/[^a-z]/g,'');
+  const isCommon=COMMON.has(pw.toLowerCase()) || (COMMON.has(lower)&&lower.length>3);
+  let entropy = pw.length? pw.length*Math.log2(pool||1):0;
+  if(isCommon) entropy=Math.min(entropy,12);
+  const guesses=Math.pow(2,entropy)/2;
+  const seconds=guesses/1e11;
+  return {pool,sets,entropy,seconds,isCommon,len:pw.length};
+}
+function humanTime(s){
+  if(s<0.001)return 'instant';
+  if(s<1)return '<1 second';
+  const units=[['second',1],['minute',60],['hour',3600],['day',86400],['year',31557600],
+    ['century',3155760000],['millennium',31557600000]];
+  if(s>3.15e19)return 'trillions of years';
+  if(s>3.15e16)return 'billions of years';
+  if(s>3.15e13)return 'millions of years';
+  let best=units[0];
+  for(const u of units){if(s>=u[1])best=u;}
+  const v=s/best[1];
+  const rounded=v>=100?Math.round(v):v>=10?Math.round(v):v.toFixed(1);
+  return rounded+' '+best[0]+(v>=2?'s':'');
+}
+function tier(entropy,isCommon){
+  if(isCommon)return {label:'Compromised — a known password',pct:6,color:'#C63A2F'};
+  if(entropy<28)return {label:'Very weak',pct:18,color:'#C63A2F'};
+  if(entropy<40)return {label:'Weak',pct:38,color:'#D98A29'};
+  if(entropy<60)return {label:'Fair',pct:58,color:'#C77D1A'};
+  if(entropy<80)return {label:'Strong',pct:80,color:'#2E7D5B'};
+  return {label:'Excellent',pct:100,color:'#2E7D5B'};
+}
+function feedback(pw,a){
+  const out=[];
+  if(!pw){return [['warn','!','Type something above to see how it holds up.']];}
+  if(a.isCommon)out.push(['bad','✕','This is one of the most common passwords in the world. Attackers try these in the first fraction of a second.']);
+  if(a.len<8)out.push(['bad','✕','Under 8 characters. Far too short — length is the single biggest factor.']);
+  else if(a.len<12)out.push(['warn','!','Between 8 and 11 characters. Push toward 16+ for real safety.']);
+  else if(a.len<16)out.push(['warn','!','Decent length. 16+ characters would move you into "excellent."']);
+  else out.push(['good','✓','Great length — this is what makes a password genuinely hard to crack.']);
+  if(a.sets<=1&&pw)out.push(['warn','!','Only one type of character. Mixing cases, numbers, or symbols raises the difficulty.']);
+  if(/^\d+$/.test(pw)&&pw)out.push(['bad','✕','Digits only. A numbers-only password is cracked almost instantly.']);
+  if(/(19|20)\d\d/.test(pw))out.push(['warn','!','Contains what looks like a year. Dates are among the first things guessed.']);
+  if(/(.)\1\1/.test(pw))out.push(['warn','!','Repeated characters (like "aaa") add length without adding real strength.']);
+  if(!a.isCommon&&a.len>=16&&a.sets>=2)out.push(['good','✓','A long passphrase like this could take an attacker geologic time to crack.']);
+  return out;
+}
+const pwField=document.getElementById('pwField');
+function refresh(){
+  const pw=pwField.value;
+  const a=analyze(pw);
+  const t=tier(a.entropy,a.isCommon);
+  document.getElementById('meterFill').style.width=(pw?t.pct:0)+'%';
+  document.getElementById('meterFill').style.background=t.color;
+  document.getElementById('verdict').textContent=pw?t.label:'Waiting…';
+  document.getElementById('verdict').style.color=pw?t.color:'var(--muted)';
+  document.getElementById('entropyTxt').textContent=pw?Math.round(a.entropy)+' bits':'';
+  document.getElementById('statLen').textContent=a.len;
+  document.getElementById('statSets').textContent=a.sets+'/4';
+  const st=document.getElementById('statTime');
+  st.textContent=pw?humanTime(a.seconds):'—';
+  st.style.color=pw?t.color:'var(--muted)';
+  const fb=document.getElementById('pwFeedback');
+  fb.innerHTML='';
+  feedback(pw,a).forEach(([cls,ic,txt])=>{
+    const d=document.createElement('div');d.className='fb '+cls;
+    d.innerHTML='<span class="ic">'+ic+'</span><span>'+txt+'</span>';
+    fb.appendChild(d);
+  });
+}
+pwField.addEventListener('input',refresh);
+const EXAMPLES=['Spring2024','P@ssw0rd','sunflower','Tr0ub4dor&3','correct-horse-battery-staple','R3g1strar!','breeze-lantern-copper-19-moss'];
+let exIdx=0;
+function fillExample(){pwField.value=EXAMPLES[exIdx%EXAMPLES.length];exIdx++;refresh();pwField.focus();}
+refresh();
+
+/* ---------------- brute-force animation ---------------- */
+let attackRAF=null;
+const CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+function randStr(len){let s='';for(let i=0;i<len;i++)s+=CHARS[Math.floor(Math.random()*CHARS.length)];return s;}
+function runAttack(){
+  const pw=pwField.value;
+  const stream=document.getElementById('stream');
+  const result=document.getElementById('attackResult');
+  const attEl=document.getElementById('attempts');
+  const elEl=document.getElementById('elapsed');
+  const btn=document.getElementById('runBtn');
+  if(attackRAF){cancelAnimationFrame(attackRAF);attackRAF=null;}
+  result.className='console-result';result.textContent='';
+  if(!pw){stream.textContent='idle — enter a password and press run';return;}
+  const a=analyze(pw);
+  const willCrack=a.seconds<2; // demo: only "instant/near-instant" pws visibly fall
+  btn.disabled=true;btn.textContent='running…';
+  let attempts=0;const t0=performance.now();
+  const displayLen=Math.min(Math.max(pw.length,4),14);
+  function frame(now){
+    const realElapsed=(now-t0)/1000;
+    // show scrambling guesses
+    stream.textContent=randStr(displayLen);
+    attempts+=Math.floor(Math.random()*90000)+40000;
+    attEl.textContent=attempts.toLocaleString();
+    if(willCrack){
+      // simulated crack after ~1.4s of drama
+      if(realElapsed>1.4){
+        stream.textContent=pw;
+        elEl.textContent=humanTime(a.seconds);
+        result.className='console-result cracked';
+        result.textContent='✕ CRACKED — this password offered almost no protection.';
+        btn.disabled=false;btn.textContent='▶ Run brute-force attack';
+        return;
+      }
+      elEl.textContent=realElapsed.toFixed(1)+'s';
+    }else{
+      // strong: show the projected (astronomical) time and give up the visual
+      elEl.textContent=realElapsed.toFixed(1)+'s';
+      if(realElapsed>2.6){
+        stream.textContent='… still guessing …';
+        result.className='console-result safe';
+        result.textContent='◇ HOLDING — at this rate the attacker needs ~'+humanTime(a.seconds)+'. They give up.';
+        btn.disabled=false;btn.textContent='▶ Run brute-force attack';
+        return;
+      }
+    }
+    attackRAF=requestAnimationFrame(frame);
+  }
+  attackRAF=requestAnimationFrame(frame);
+}
+
+/* ---------------- demo accounts ---------------- */
+const DEMO=[
+  ['j.okafor','Spring2024','Season + year, easy to remember'],
+  ['m.delgado','Registrar1','Where they work + a "1"'],
+  ['t.nguyen','password123','The classic default'],
+  ['a.kowalski','Huskies!','School spirit + one symbol'],
+  ['s.abebe','Jennifer2011','A kid\'s name + birth year'],
+  ['r.santos','xK9#mvz@Lp2$rQ','Random, from a password manager'],
+  ['l.friedman','copper-lantern-breeze-moss','A four-word passphrase'],
+];
+function classify(sec){
+  if(sec<60)return ['instant','instant'];
+  if(sec<86400*90)return ['weak',humanTime(sec)];
+  return ['ok',humanTime(sec)];
+}
+const demoBody=document.getElementById('demoRows');
+DEMO.forEach(([u,p,why])=>{
+  const a=analyze(p);const [cls,txt]=classify(a.seconds);
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td class="mono">'+u+'</td><td class="pw">'+p+'</td><td style="color:var(--muted)">'+why+'</td>'+
+    '<td><span class="pill '+cls+'">'+txt+'</span></td>';
+  demoBody.appendChild(tr);
+});
+
+/* ---------------- phishing inbox ---------------- */
+const EMAILS=[
+  {
+    name:'IT Service Desk',addr:'it-support@ubc-secure-login.net',
+    subj:'ACTION REQUIRED: Your mailbox will be deactivated in 24 hours',
+    body:'Dear User,\n\nOur records indicate your account has exceeded its storage quota. To avoid deactivation within 24 hours, verify your credentials immediately:\n\n[ Re-validate my account ]  https://ubc-secure-login.net/verify\n\nFailure to act will result in permanent loss of access.\n\nIT Service Desk',
+    phish:true,
+    why:['The sender domain is <b>ubc-secure-login.net</b> — not a real university domain. Legitimate IT uses the institution\'s own domain.','Manufactured urgency: "24 hours" and "permanent loss" are designed to make you panic and click.','Generic greeting ("Dear User") instead of your name.','The link text and the real URL point to an outside site built to harvest your password.']
+  },
+  {
+    name:'Payroll Services',addr:'payroll@myuniversity.edu',
+    subj:'Your February direct deposit statement is available',
+    body:'Hello,\n\nYour pay statement for the February 15 pay period is now available in the self-service portal.\n\nTo view it, log in to the portal directly from your bookmark or the staff homepage — we\'ll never ask you to enter your password from an email link.\n\nQuestions? Reply to this message or call the Payroll office at the number in the staff directory.\n\nPayroll Services',
+    phish:false,
+    why:['The sender uses the real institutional domain.','It does <b>not</b> ask you to click a login link — it tells you to navigate to the portal yourself, which is exactly what safe senders do.','No urgency, no threats, and it points you to verify through known channels (the staff directory).']
+  },
+  {
+    name:'Dr. Patricia Vance',addr:'p.vance.registrar@gmail.com',
+    subj:'Quick favor — are you at your desk?',
+    body:'Hi,\n\nI\'m heading into back-to-back meetings and can\'t take calls. I need you to purchase four $200 gift cards for a donor appreciation event this afternoon. Send me the codes as soon as you have them and I\'ll approve reimbursement.\n\nKeep this between us for now — it\'s a surprise.\n\nSent from my iPhone\nPatricia',
+    phish:true,
+    why:['A supervisor\'s name paired with a <b>personal gmail address</b>, not their work account — a classic impersonation setup.','Gift-card requests are almost never legitimate business processes.','"Keep this between us" isolates you so you can\'t verify with anyone.','Urgency plus unavailability ("can\'t take calls") prevents you from confirming by phone.']
+  },
+  {
+    name:'Office of the Registrar',addr:'no-reply@myuniversity.edu',
+    subj:'Reminder: grade submission deadline is Friday',
+    body:'Faculty and staff,\n\nThis is a reminder that final grades for the winter term are due by 5:00 PM this Friday.\n\nInstructions and the submission portal are linked from the faculty resources page on the staff intranet. If you need an extension, contact your department administrator.\n\nThank you,\nOffice of the Registrar',
+    phish:false,
+    why:['Sent from the real institutional domain.','Routine, expected content with a deadline that matches the academic calendar — not artificial pressure.','It points to the intranet and a known human (your department admin) rather than an outside link.','No request for credentials or money.']
+  },
+  {
+    name:'Student Records Portal',addr:'records@my-university-portal.com',
+    subj:'FERPA compliance: re-confirm your access authorization',
+    body:'Notice:\n\nAs part of an annual FERPA audit, all staff with access to student records must re-confirm their authorization within 48 hours.\n\nConfirm here: [ Verify FERPA access ]  http://my-university-portal.com/ferpa-auth\n\nUnconfirmed accounts will have record access suspended.\n\nCompliance Office',
+    phish:true,
+    why:['Uses a real-sounding compliance topic (FERPA) to seem official — a common tactic against university staff.','Domain <b>my-university-portal.com</b> is a look-alike, not the institution\'s domain, and the link is plain <b>http</b>, not secure https.','48-hour deadline plus a threat to suspend access = pressure to act without thinking.','Real compliance re-certifications go through official internal systems, not emailed links.']
+  },
+  {
+    name:'Marcus Bell',addr:'m.bell@myuniversity.edu',
+    subj:'Re: transcript request for transfer student',
+    body:'Hi,\n\nFollowing up on the transfer applicant we discussed at Tuesday\'s meeting — could you send over the official transcript when you get a chance? The student\'s ID is in the shared tracking sheet.\n\nNo rush, sometime this week is fine.\n\nThanks,\nMarcus',
+    phish:false,
+    why:['From a colleague on the real institutional domain.','References a specific shared context ("Tuesday\'s meeting," "the shared tracking sheet") that an outsider wouldn\'t know.','Relaxed timeline — "no rush" — the opposite of phishing\'s manufactured urgency.','No links, no credential requests. If anything felt off, you could still confirm with Marcus directly.']
+  },
+  {
+    name:'Benefits Enrollment',addr:'hr-benefits@myuniversity-hr.co',
+    subj:'You have an unclaimed tuition reimbursement of $1,480',
+    body:'Congratulations,\n\nOur system shows you have an UNCLAIMED tuition reimbursement of $1,480.00 waiting to be processed.\n\nTo release your funds, confirm your banking details within 3 business days:\n\n[ Claim my reimbursement ]\n\nHR Benefits Team',
+    phish:true,
+    why:['Too-good-to-be-true "unclaimed money" is a lure to get you to act quickly.','Domain <b>myuniversity-hr.co</b> is a look-alike of the real one (note the odd .co and extra "-hr").','Asks you to "confirm banking details" from an email — legitimate HR never collects bank info this way.','Deadline pressure ("3 business days") again rushes your judgment.']
+  },
+  {
+    name:'Facilities Notice',addr:'facilities@myuniversity.edu',
+    subj:'Planned power maintenance — Admin Building, Saturday',
+    body:'All staff,\n\nPlease be aware of scheduled electrical maintenance in the Administration Building this Saturday from 6:00 AM to 10:00 AM. Systems in that building, including networked printers, may be briefly unavailable.\n\nNo action is required on your part. Details are posted on the facilities page of the staff intranet.\n\nFacilities Management',
+    phish:false,
+    why:['Real institutional domain and a mundane, plausible operational notice.','Explicitly states "no action is required" — it isn\'t trying to get you to do anything.','No links to click, no credentials or payment requested.','Points to the intranet for details, consistent with how internal notices actually work.']
+  }
+];
+let reviewed=0;const answered=new Array(EMAILS.length).fill(false);
+function buildInbox(){
+  const box=document.getElementById('inbox');box.innerHTML='';
+  reviewed=0;answered.fill(false);updateScore();
+  EMAILS.forEach((e,i)=>{
+    const el=document.createElement('div');el.className='email';
+    const bodyHtml=e.body.replace(/\[ (.*?) \]/g,'<span class="link">[ $1 ]</span>')
+                         .replace(/(https?:\/\/[^\s]+)/g,'<span class="link">$1</span>');
+    el.innerHTML=
+      '<div class="email-meta"><div class="email-from">'+
+        '<span class="email-name">'+e.name+'</span>'+
+        '<span class="email-addr">&lt;'+e.addr+'&gt;</span></div>'+
+        '<div class="email-subj">'+e.subj+'</div></div>'+
+      '<div class="email-body">'+bodyHtml+'</div>'+
+      '<div class="email-actions">'+
+        '<button class="choice pick-phish" onclick="answer('+i+',true,this)">🚩 Flag as phishing</button>'+
+        '<button class="choice pick-legit" onclick="answer('+i+',false,this)">✓ Looks legitimate</button>'+
+      '</div>'+
+      '<div class="reveal" id="rev'+i+'"></div>';
+    box.appendChild(el);
+  });
+}
+function answer(i,guessPhish,btn){
+  if(answered[i])return;
+  answered[i]=true;reviewed++;
+  const e=EMAILS[i];const correct=(guessPhish===e.phish);
+  const actions=btn.parentElement;
+  [...actions.children].forEach(b=>b.disabled=true);
+  btn.classList.add(correct?'chosen-correct':'chosen-wrong');
+  const rev=document.getElementById('rev'+i);
+  rev.classList.add('show');
+  const cls=e.phish?'is-phish':'is-legit';
+  const verdict=e.phish?'This is phishing':'This is legitimate';
+  const head=correct?'✓ Correct — ':'✕ Not quite — ';
+  rev.innerHTML='<div class="reveal-inner '+cls+'">'+
+    '<div class="reveal-verdict">'+head+verdict+'</div>'+
+    '<div style="font-size:13.5px;color:var(--ink-soft);margin-bottom:4px">The tells:</div>'+
+    '<ul class="flags">'+e.why.map(w=>'<li>'+w+'</li>').join('')+'</ul></div>';
+  updateScore();
+}
+function updateScore(){
+  document.getElementById('phishScore').textContent='Score: '+reviewed+' / '+EMAILS.length+' reviewed';
+}
+function resetPhish(){buildInbox();window.scrollTo({top:0,behavior:'smooth'});}
+buildInbox();
+
+/* ---------------- blast radius ---------------- */
+const NODES=[
+  {id:'a',x:70, y:205,w:160,label:'Compromised coworker',sub:'patient zero',icon:'!'},
+  {id:'b',x:300,y:90, w:170,label:'Their email account',sub:'the master key',icon:'@'},
+  {id:'c',x:300,y:325,w:170,label:'Trusting colleagues',sub:'inbox next door',icon:'✉'},
+  {id:'d',x:520,y:60, w:180,label:'Student records + drives',sub:'the data trove',icon:'▤'},
+  {id:'e',x:520,y:205,w:180,label:'Payroll + payments',sub:'the money',icon:'$'},
+  {id:'f',x:540,y:335,w:170,label:'The whole institution',sub:'everyone',icon:'◍'},
+];
+const STEPS=[
+  {
+    kicker:'Step 1 · The account falls',
+    title:'One click hands over the keys',
+    body:'A coworker clicks a link that looks like it came from someone they trust and enters their password — or approves a multi-factor prompt they didn\'t start. In under an hour, an attacker controls their account. Nothing looks broken. The coworker may not even know yet.',
+    source:['Documented','UNC School of Medicine, Feb. 2024: an employee clicked a phishing link sent from a known, trusted contact and shared their MFA code. The attacker was inside the email account within the hour.'],
+    nodes:['a'],edges:[]
+  },
+  {
+    kicker:'Step 2 · The inbox is a master key',
+    title:'Email unlocks almost everything else',
+    body:'A work inbox isn\'t just messages — it\'s the reset button for every other system. "Forgot password?" links land there. With the inbox, the attacker can quietly take over connected apps one by one, without ever guessing another password.',
+    source:['Documented','FBI IC3, 2024: an email account is the hub of a professional\'s digital life. Stolen email credentials let attackers reach nearly every other account through password resets.'],
+    nodes:['a','b'],edges:['e-ab']
+  },
+  {
+    kicker:'Step 3 · The phish spreads sideways',
+    title:'Now the scam comes from a real colleague',
+    body:'The attacker emails the rest of the office from the compromised — and completely genuine — internal address. Coworkers have no reason to doubt it. Each person who clicks becomes the next compromised account, and the circle widens.',
+    source:['Documented','This is exactly how the UNC case began: the malicious link arrived from an already-trusted contact. Boise State (2024–25) saw multiple staff fall for phishing that then altered direct-deposit details.'],
+    nodes:['a','b','c'],edges:['e-ab','e-ac']
+  },
+  {
+    kicker:'Step 4 · The data trove opens',
+    title:'The attacker inherits every permission the account had',
+    body:'A compromised account keeps all of its legitimate access. Shared mailboxes, student records, financial aid files, network drives — whatever that coworker could open, the attacker can now open too. One ordinary employee\'s login can expose the entire archive.',
+    source:['Documented','Princeton, Nov. 2025: one phished employee with routine database access exposed alumni, donor, and student records. PowerSchool (2024): stolen subcontractor credentials reached data on tens of millions of students.'],
+    nodes:['a','b','c','d'],edges:['e-ab','e-ac','e-bd','e-cd']
+  },
+  {
+    kicker:'Step 5 · The money moves',
+    title:'Impersonation turns access into theft',
+    body:'Wearing the trusted account like a mask, the attacker redirects a paycheck\'s direct deposit, changes vendor banking details, or asks a colleague to approve a payment. Because the request comes from a real coworker, it often works.',
+    source:['Documented','FBI IC3, 2024: business email compromise drove about $2.77 billion in reported losses across 21,442 complaints — frequently through compromised accounts and redirected payroll or vendor payments.'],
+    nodes:['a','b','c','d','e'],edges:['e-ab','e-ac','e-bd','e-cd','e-be','e-ce']
+  },
+  {
+    kicker:'Step 6 · Everyone pays',
+    title:'One click, a whole institution in the blast radius',
+    body:'Breach notifications go out. Credit monitoring is offered. FERPA and privacy obligations kick in. There\'s cleanup cost, lost time, and lasting damage to trust — landing on people who never clicked anything. The blast radius of one account is the entire office.',
+    source:['Documented','Columbia University, 2025: roughly 870,000 people\'s data, including Social Security numbers, was exposed. Total U.S. cybercrime losses in 2024 hit a record $16.6 billion, up 33% in a single year.'],
+    nodes:['a','b','c','d','e','f'],edges:['e-ab','e-ac','e-bd','e-cd','e-be','e-ce','e-df','e-ef']
+  }
+];
+let blastStep=0;
+function renderNodes(){
+  const g=document.getElementById('blastNodes');g.innerHTML='';
+  NODES.forEach(n=>{
+    const el=document.createElementNS('http://www.w3.org/2000/svg','g');
+    el.setAttribute('class','node-box pending');el.setAttribute('id','node-'+n.id);
+    el.innerHTML=
+      '<rect class="node-rect" x="'+n.x+'" y="'+n.y+'" width="'+n.w+'" height="58" rx="11"/>'+
+      '<text class="node-icon" x="'+(n.x+18)+'" y="'+(n.y+34)+'" text-anchor="middle">'+n.icon+'</text>'+
+      '<text class="node-label" x="'+(n.x+34)+'" y="'+(n.y+25)+'">'+n.label+'</text>'+
+      '<text class="node-sub" x="'+(n.x+34)+'" y="'+(n.y+42)+'">'+n.sub+'</text>';
+    g.appendChild(el);
+  });
+}
+function renderDots(){
+  const d=document.getElementById('blastDots');d.innerHTML='';
+  STEPS.forEach((_,i)=>{const i2=document.createElement('i');d.appendChild(i2);});
+}
+function paintBlast(){
+  // reset
+  NODES.forEach(n=>{const el=document.getElementById('node-'+n.id);el.setAttribute('class','node-box pending');});
+  document.querySelectorAll('#blastEdges .edge').forEach(e=>e.classList.remove('hot'));
+  const btn=document.getElementById('blastNext');
+  const explain=document.getElementById('blastExplain');
+  if(blastStep===0){
+    NODES.forEach(n=>{const el=document.getElementById('node-'+n.id);el.setAttribute('class','node-box safe');});
+    document.getElementById('blastStepKicker').textContent='Step 0 · Before the click';
+    document.getElementById('blastStepTitle').textContent='One ordinary account, one ordinary day';
+    document.getElementById('blastStepBody').textContent='Everyone in the office has legitimate access to something — an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button to trace what happens after one coworker clicks the wrong link.';
+    document.getElementById('blastStepSource').style.display='none';
+    explain.classList.add('safe-state');
+    btn.textContent='▶ Trace the first hop';btn.disabled=false;
+  }else{
+    const s=STEPS[blastStep-1];
+    s.nodes.forEach(id=>{const el=document.getElementById('node-'+id);el.setAttribute('class','node-box hot');});
+    s.edges.forEach(ed=>{const e=document.querySelector('[data-edge="'+ed+'"]');if(e)e.classList.add('hot');});
+    document.getElementById('blastStepKicker').textContent=s.kicker;
+    document.getElementById('blastStepTitle').textContent=s.title;
+    document.getElementById('blastStepBody').textContent=s.body;
+    const src=document.getElementById('blastStepSource');
+    src.style.display='block';
+    src.innerHTML='<b>'+s.source[0]+'</b><br>'+s.source[1];
+    explain.classList.remove('safe-state');
+    if(blastStep>=STEPS.length){btn.textContent='Spread complete';btn.disabled=true;}
+    else{btn.textContent='▶ Next hop';btn.disabled=false;}
+  }
+  // dots
+  const dots=[...document.querySelectorAll('#blastDots i')];
+  dots.forEach((d,i)=>{d.className='';if(i<blastStep-1)d.classList.add('done');else if(i===blastStep-1)d.classList.add('current');});
+}
+function blastNext(){if(blastStep<STEPS.length){blastStep++;paintBlast();}}
+function blastReset(){blastStep=0;paintBlast();}
+renderNodes();renderDots();paintBlast();
+</script>
+</body>
+</html>
