@@ -93,7 +93,7 @@
   flex-wrap: wrap;       /* prevents overflow on small screens */
   }
   .spud-art{
-    height:200px;                 /* ← the one number to tune */
+    height:200px;                 /* the one number to tune */
     width: 150px;
     margin:0 auto 12px;
     display:flex;align-items:center;justify-content:center;
@@ -121,6 +121,13 @@
   font-family:'Helvetica',monospace;font-size:13px;font-weight:700;
   color:var(--rudy);text-align:center;letter-spacing:.06em;
 }
+  .spud-name{font-family:'Helvetica',sans-serif;font-weight:700;font-size:15px;color:var(--ink);text-align:center;margin-top:4px}
+  .spud-back{margin-top:16px;background:var(--danger-bg);border-radius:8px;padding:14px 16px;font-size:14px;color:#7a271f}
+  .griddle{background:var(--rudy);color:var(--paper);border-radius:14px;padding:22px 24px;margin-top:18px}
+  .griddle h3{margin:0 0 10px;font-size:19px;color:var(--paper)}
+  .griddle p{margin:0 0 10px;;font-size:15px}
+  .griddle p:last-child{margin-bottom:0}
+  .griddle .hot{font-weight:700}
   /* ---- password lab ---- */
   .pw-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .pw-input{
@@ -299,6 +306,7 @@
   <button class="tab" role="tab" aria-selected="false" aria-controls="p-blast" id="t-blast">Blast Radius</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="p-recap" id="t-recap">Takeaways</button>
 </nav>
+
 <main>
   <!-- INTRO -->
   <div class="panel active" id="p-intro" role="tabpanel" aria-labelledby="t-intro">
@@ -335,12 +343,12 @@
 <!-- Passwords Information -->
   <div class="panel" id="p-passinfo" role="tabpanel" aria-labelledby="t-passinfo">
     <h2 class="blocktitle" style="font-size:28px">Passwords: It's (Almost) All Math</h2>
-    <!-- ─────────── PART ONE ─────────── -->
+    <!-- PART ONE -->
     <section class="block">
       <p class="kicker">Part One</p>
       <h2 class="blocktitle" style="font-size:24px">The Math</h2>
 
-      <p>A password of any given length (<b>L</b>) built using a character set of size (<b>N</b> - which represents complexity) creates a combination of posibilities where:</p>
+      <p>A password of any given length (<b>L</b>) built using a character set of size (<b>N</b>, which represents complexity) creates a combination of posibilities where:</p>
 
       <math display="block">
         <mi>Possible Combinations</mi>
@@ -416,7 +424,7 @@
       </table>
     </section>
 
-    <!-- ─────────── PART TWO ─────────── -->
+    <!-- PART TWO -->
     <section class="block">
       <p class="kicker">Part Two</p>
       <h2 class="blocktitle" style="font-size:24px">What Is Actually Stored</h2>
@@ -433,6 +441,7 @@
           <div class="spud-art">
             <img src="images/potato.jpg" alt="A single raw potato, whole and unpeeled">
           </div>
+          <div class="spud-name">A potato</div>
         </div>
         <div class="spud-arrow">
           <span class="glyph">→</span>
@@ -442,6 +451,7 @@
           <div class="spud-art">
             <img src="images/hashbrown.jpg" alt="A cooked hashbrown, shredded and fried golden brown">
           </div>
+          <div class="spud-name">A hashbrown</div>
         </div>
       </div>
 
@@ -489,7 +499,7 @@
       </div>
     </section>
 
-    <!-- ─────────── PART THREE ─────────── -->
+    <!-- PART THREE -->
     <section class="block">
       <p class="kicker">Part Three</p>
       <h2 class="blocktitle" style="font-size:24px">How the Guessing Actually Happens</h2>
@@ -500,9 +510,9 @@
 
       <p>The unsubtle approach. Start at <span class="mono">aaaaaaaa</span>, hash it, compare. Then <span class="mono">aaaaaaab</span>. Then <span class="mono">aaaaaaac</span>. Continue through every combination the character set allows until something matches.
         <br><br>
-        There is no cleverness here at all — only speed. A single modern graphics card makes billions of guesses per second, and a purpose-built rig reaches roughly 100 billion per second against a fast hash. That is the number the Password Lab uses.
+        There is no cleverness here at all, only speed. A single modern graphics card makes billions of guesses per second, and a purpose-built rig reaches roughly 100 billion per second against a fast hash. That is the number the Password Lab uses.
         <br><br>
-        Brute force is the attack that the N<sup>L</sup> math from Part One defeats directly. Every character you add multiplies the attacker's work by the size of the character set, <i>exponentially</i>. This is why the 16-character row in that first table is roughly 200 billion times larger than the 8-character row. Past about 16 characters, exhaustive guessing stops being worth attempting — the universe is not old enough.
+        Brute force is the attack that the N<sup>L</sup> math from Part One defeats directly. Every character you add multiplies the attacker's work by the size of the character set, <i>exponentially</i>. This is why the 16-character row in that first table is roughly 200 billion times larger than the 8-character row. Past about 16 characters, exhaustive guessing stops being worth attempting. The universe is not old enough.
       </p>
 
       <div class="feedback">
@@ -513,7 +523,7 @@
 
       <p>This is the attack that breaks most real passwords, and it is the reason Part One is only <i>almost</i> the whole story.
         <br><br>
-        Brute force treats every 8-character string as equally likely. But people do not pick random strings — they pick words. So instead of counting up from <span class="mono">aaaaaaaa</span>, the attacker starts with a list: dictionary words, names, sports teams, cities, and most damaging of all, hundreds of millions of real passwords harvested from previous breaches.
+        Brute force treats every 8-character string as equally likely. But people do not pick random strings; they pick words. So instead of counting up from <span class="mono">aaaaaaaa</span>, the attacker starts with a list: dictionary words, names, sports teams, cities, and most damaging of all, hundreds of millions of real passwords harvested from previous breaches.
         <br><br>
         Then the software applies <b>rules</b>, automatically: capitalize the first letter. Append a year. Append an exclamation mark. Swap <span class="mono">a</span> for <span class="mono">@</span>, <span class="mono">o</span> for <span class="mono">0</span>, <span class="mono">i</span> for <span class="mono">1</span>. Try every combination of those.
         <br><br>
@@ -540,35 +550,35 @@
         </tr>
       </table>
 
-      <p><br>Same length. Same character sets. Wildly different outcomes — because one lives in a search space of thousands and the other lives in a search space of trillions. <b>Length only protects you when the attacker has to search the whole space.</b></p>
+      <p><br>Same length. Same character sets. Wildly different outcomes, because one lives in a search space of thousands and the other lives in a search space of trillions. <b>Length only protects you when the attacker has to search the whole space.</b></p>
 
       <div class="feedback">
-        <div class="fb good"><span class="ic">✓</span><span><b>What defeats it:</b> unpredictability, not decoration. Symbol substitutions buy you almost nothing. A passphrase of unrelated words — <span class="mono">copper-lantern-breeze-moss</span> — is long <i>and</i> unguessable, which is the combination that works.</span></div>
+        <div class="fb good"><span class="ic">✓</span><span><b>What defeats it:</b> unpredictability, not decoration. Symbol substitutions buy you almost nothing. A passphrase of unrelated words like <span class="mono">copper-lantern-breeze-moss</span> is long <i>and</i> unguessable, which is the combination that works.</span></div>
       </div>
 
       <h3><br>3. Rainbow Table: Do the Work Once, Look It Up Forever</h3>
 
       <p>Hashing takes time. If an attacker is going to crack thousands of stolen hashes, why hash the word <span class="mono">password</span> over and over for each one?
         <br><br>
-        They do not. They compute the hashes for millions of likely passwords <i>in advance</i>, store the results in an enormous precomputed lookup structure, and then simply look up each stolen hash to see which password produced it. Cracking stops being a computation and becomes a lookup — and a lookup is close to instantaneous.
+        They do not. They compute the hashes for millions of likely passwords <i>in advance</i>, store the results in an enormous precomputed lookup structure, and then simply look up each stolen hash to see which password produced it. Cracking stops being a computation and becomes a lookup, and a lookup is close to instantaneous.
         <br><br>
         This works precisely because hashing is deterministic. The word <span class="mono">password</span> hashes to <span class="mono">5e884898…</span> on every system on earth, forever. The same potato always makes the same hashbrown. Which means a table built years ago still works against a database stolen tomorrow.
       </p>
 
-      <p><br><b>The countermeasure is salting.</b> A <b>salt</b> is a unique random value the system adds to your password before hashing it. If your salt is <span class="mono">x7f2</span>, the system does not hash <span class="mono">password</span> — it hashes <span class="mono">passwordx7f2</span>, producing an entirely different hash.
+      <p><br><b>The countermeasure is salting.</b> A <b>salt</b> is a unique random value the system adds to your password before hashing it. If your salt is <span class="mono">x7f2</span>, the system does not hash <span class="mono">password</span>; it hashes <span class="mono">passwordx7f2</span>, producing an entirely different hash.
         <br><br>
-        In kitchen terms: every account gets its own secret seasoning mixed in before shredding. Two employees who both chose <span class="mono">password</span> now have completely different stored hashes. Every precomputed table in the world becomes useless, because none of them were built with your salt. The attacker is forced back to guessing one password at a time — right back into the math from Part One.
+        In kitchen terms: every account gets its own secret seasoning mixed in before shredding. Two employees who both chose <span class="mono">password</span> now have completely different stored hashes. Every precomputed table in the world becomes useless, because none of them were built with your salt. The attacker is forced back to guessing one password at a time, right back into the math from Part One.
       </p>
 
       <div class="feedback">
-        <div class="fb warn"><span class="ic">!</span><span><b>What defeats it:</b> salting — but that is the <i>system's</i> job, not yours. You cannot salt someone else's database, and plenty of older systems never bothered. What you control is blast radius: if that unsalted forum from 2014 gets breached, a unique password means it costs you one account instead of all of them.</span></div>
+        <div class="fb warn"><span class="ic">!</span><span><b>What defeats it:</b> salting, but that is the <i>system's</i> job, not yours. You cannot salt someone else's database, and plenty of older systems never bothered. What you control is blast radius: if that unsalted forum from 2014 gets breached, a unique password means it costs you one account instead of all of them.</span></div>
       </div>
 
       <h3><br>And One That Needs No Cracking At All</h3>
 
       <p><b>Credential stuffing.</b> An attacker takes an email and password that already leaked from one breached site and simply tries the pair on a hundred others. Nothing is guessed. Nothing is reversed. No hash is broken. The password is just <i>correct</i>.
         <br><br>
-        Against this, password strength is <b>completely irrelevant</b>. Your strongest possible password is defeated the moment you use it in two places. Only uniqueness helps — and multi-factor authentication, which stops the attacker even when the password is right.
+        Against this, password strength is <b>completely irrelevant</b>. Your strongest possible password is defeated the moment you use it in two places. Only uniqueness helps, along with multi-factor authentication, which stops the attacker even when the password is right.
       </p>
 
       <h3><br>Putting It Together</h3>
@@ -583,7 +593,7 @@
         <tr>
           <td><b>Brute force</b></td>
           <td>Short passwords, however complex</td>
-          <td><span class="pill ok">Length — 16+ characters</span></td>
+          <td><span class="pill ok">Length: 16+ characters</span></td>
         </tr>
         <tr>
           <td><b>Dictionary</b></td>
@@ -656,7 +666,6 @@
           <tbody id="demoRows"></tbody>
         </table>
       </div>
-      <!-- <div class="facil"><b>Discussion prompt</b><br>Ask the room: how many of these patterns look familiar? The point isn't shame — it's that attackers know these patterns too, and try them first.</div> -->
     </section>
     <div><button class="btn" onclick="showTab('phish')">Next →</button></div>
   </div>
@@ -678,13 +687,12 @@
   <div class="panel" id="p-blast" role="tabpanel" aria-labelledby="t-blast">
     <p class="kicker">Lab 3</p>
     <h2 class="blocktitle" style="font-size:28px">Blast Radius</h2>
-    <p class="lede">A breach rarely stops with one person. Watch how a single compromised coworker becomes everyone's problem — one hop at a time. Every step below maps to a real, documented incident.</p>
+    <p class="lede">A breach rarely stops with one person. Watch how a single compromised coworker becomes everyone's problem, one hop at a time. Every step below maps to a real, documented incident.</p>
 
     <section class="block">
       <div class="card">
         <div class="blast-stage">
           <svg viewBox="0 0 720 470" id="blastSvg" role="img" aria-label="Diagram showing how one compromised account spreads through an office">
-            <!-- edges -->
             <g id="blastEdges" stroke-linecap="round" fill="none">
               <line class="edge" data-edge="e-ab" x1="150" y1="235" x2="300" y2="120"/>
               <line class="edge" data-edge="e-ac" x1="150" y1="235" x2="300" y2="355"/>
@@ -695,7 +703,6 @@
               <line class="edge" data-edge="e-df" x1="580" y1="95"  x2="600" y2="360"/>
               <line class="edge" data-edge="e-ef" x1="580" y1="235" x2="600" y2="360"/>
             </g>
-            <!-- nodes -->
             <g id="blastNodes"></g>
           </svg>
         </div>
@@ -711,7 +718,7 @@
       <div class="card blast-explain" id="blastExplain">
         <p class="kicker" id="blastStepKicker">Step 0 · Before the click</p>
         <h3 id="blastStepTitle" style="margin:0 0 8px;font-size:20px">One ordinary account, one ordinary day</h3>
-        <p id="blastStepBody" style="margin:0 0 12px;color:var(--ink-soft);font-size:15px">Everyone in the office has legitimate access to something — an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button above to trace what happens after one coworker clicks the wrong link.</p>
+        <p id="blastStepBody" style="margin:0 0 12px;color:var(--ink-soft);font-size:15px">Everyone in the office has legitimate access to something: an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button above to trace what happens after one coworker clicks the wrong link.</p>
         <div class="blast-source" id="blastStepSource" style="display:none"></div>
       </div>
     </section>
@@ -725,18 +732,17 @@
         <div class="stat"><div class="lbl">Business email compromise losses</div><div class="val" style="color:var(--danger)">$2.77B</div></div>
         <div class="stat"><div class="lbl">Phishing complaints, most-reported crime</div><div class="val">193,407</div></div>
       </div>
-      <div class="facil"><b>Discussion prompt</b><br>Ask: whose access, in this office, would an attacker most want? The answer is usually "whoever has the student records and the payment approvals" — which may be the person who feels least like a target.</div>
     </section>
 
     <section class="block">
       <div class="card" style="padding:16px 20px">
         <p class="kicker" style="margin-bottom:8px">Sources</p>
         <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted);line-height:1.7">
-          <li>FBI Internet Crime Complaint Center (IC3), 2024 Internet Crime Report, released April 23, 2025 — total losses, BEC losses, phishing complaint counts.</li>
-          <li>UNC School of Medicine data security notice — Feb. 2024 account compromise via a phishing link from a trusted contact and a shared MFA code.</li>
-          <li>PowerSchool breach (disclosed late 2024/2025) — subcontractor credentials used to reach a support portal serving tens of millions of student records.</li>
-          <li>Princeton University Advancement breach — Nov. 10, 2025, one phished employee with routine database access; alumni, donor, and student data exposed.</li>
-          <li>Columbia University breach (2025) — data of roughly 870,000 people, including Social Security numbers, exposed.</li>
+          <li>FBI Internet Crime Complaint Center (IC3), 2024 Internet Crime Report, released April 23, 2025: total losses, BEC losses, phishing complaint counts.</li>
+          <li>UNC School of Medicine data security notice, Feb. 2024 account compromise via a phishing link from a trusted contact and a shared MFA code.</li>
+          <li>PowerSchool breach (disclosed late 2024/2025): subcontractor credentials used to reach a support portal serving tens of millions of student records.</li>
+          <li>Princeton University Advancement breach, Nov. 10, 2025, one phished employee with routine database access; alumni, donor, and student data exposed.</li>
+          <li>Columbia University breach (2025): data of roughly 870,000 people, including Social Security numbers, exposed.</li>
         </ul>
       </div>
     </section>
@@ -754,7 +760,7 @@
           <li><b>Length wins.</b> A long passphrase of ordinary words beats a short string of symbols. Aim for 16+ characters.</li>
           <li><b>Never reuse.</b> One breached site shouldn't unlock the rest of your life. A password manager makes unique passwords effortless.</li>
           <li><b>Turn on multi-factor authentication.</b> Even a cracked password is useless without the second factor.</li>
-          <li><b>Don't build passwords from public facts</b> — names, mascots, the current year, the season. Attackers guess these first.</li>
+          <li><b>Don't build passwords from public facts:</b> names, mascots, the current year, the season. Attackers guess these first.</li>
         </ul>
       </div>
     </section>
@@ -765,7 +771,7 @@
           <li><b>Check the actual sender address</b>, not just the display name. Hover before you trust.</li>
           <li><b>Urgency is a weapon.</b> "Act now or lose access" is designed to stop you thinking. Slow down.</li>
           <li><b>Hover over links</b> to see where they really go. When in doubt, navigate to the site yourself instead of clicking.</li>
-          <li><b>Verify money and data requests</b> through a second channel — a phone call, an in-person check especially if the "sender" is a supervisor.</li>
+          <li><b>Verify money and data requests</b> through a second channel: a phone call, an in-person check especially if the "sender" is a supervisor.</li>
           <li><b>Report, don't just delete.</b> Forwarding a phish to IT protects the colleague who gets it next.</li>
         </ul>
       </div>
@@ -799,17 +805,17 @@
         <div class="feedback">
           <div class="fb warn">
             <span class="ic">→</span>
-            <span><b><a href="https://www.eff.org/dice" target="_blank" rel="noopener" style="color:inherit">EFF — Dice-Generated Passphrases</a></b><br>
+            <span><b><a href="https://www.eff.org/dice" target="_blank" rel="noopener" style="color:inherit">EFF: Dice-Generated Passphrases</a></b><br>
             The Electronic Frontier Foundation's method for building a genuinely random, memorable passphrase using physical dice. This is where the four-word-passphrase advice comes from, with the math laid out.</span>
           </div>
           <div class="fb warn">
             <span class="ic">→</span>
-            <span><b><a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener" style="color:inherit">NIST SP 800-63B — Digital Identity Guidelines</a></b><br>
+            <span><b><a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener" style="color:inherit">NIST SP 800-63B: Digital Identity Guidelines</a></b><br>
             The U.S. federal standard, and the reason modern guidance abandoned forced 90-day rotation and mandatory symbol rules. Dry reading, but it is the source nearly everything else cites. Section 5.1.1 covers passwords.</span>
           </div>
           <div class="fb warn">
             <span class="ic">→</span>
-            <span><b><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html" target="_blank" rel="noopener" style="color:inherit">OWASP — Password Storage Cheat Sheet</a></b><br>
+            <span><b><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html" target="_blank" rel="noopener" style="color:inherit">OWASP: Password Storage Cheat Sheet</a></b><br>
             The developer's side of Part Two: how systems are <i>supposed</i> to hash and salt credentials, and what they get wrong. Read this if the hashbrowns made you curious about the kitchen.</span>
           </div>
         </div>
@@ -826,8 +832,8 @@
           </div>
         </div>
       </div>
-  </div>
     </section>
+  </div>
 </main>
 
 <script>
@@ -879,7 +885,7 @@ function humanTime(s){
   return rounded+' '+best[0]+(v>=2?'s':'');
 }
 function tier(entropy,isCommon){
-  if(isCommon)return {label:'Compromised — a known password',pct:6,color:'#C63A2F'};
+  if(isCommon)return {label:'Compromised: a known password',pct:6,color:'#C63A2F'};
   if(entropy<28)return {label:'Very weak',pct:18,color:'#C63A2F'};
   if(entropy<40)return {label:'Weak',pct:38,color:'#D98A29'};
   if(entropy<60)return {label:'Fair',pct:58,color:'#C77D1A'};
@@ -890,10 +896,10 @@ function feedback(pw,a){
   const out=[];
   if(!pw){return [['warn','!','Type something above to see how it holds up.']];}
   if(a.isCommon)out.push(['bad','✕','This is one of the most common passwords in the world. Attackers try these in the first fraction of a second.']);
-  if(a.len<8)out.push(['bad','✕','Under 8 characters. Far too short — length is the single biggest factor.']);
+  if(a.len<8)out.push(['bad','✕','Under 8 characters. Far too short. Length is the single biggest factor.']);
   else if(a.len<12)out.push(['warn','!','Between 8 and 11 characters. Push toward 16+ for real safety.']);
   else if(a.len<16)out.push(['warn','!','Decent length. 16+ characters would move you into "excellent."']);
-  else out.push(['good','✓','Great length — this is what makes a password genuinely hard to crack.']);
+  else out.push(['good','✓','Great length. This is what makes a password genuinely hard to crack.']);
   if(a.sets<=1&&pw)out.push(['warn','!','Only one type of character. Mixing cases, numbers, or symbols raises the difficulty.']);
   if(/^\d+$/.test(pw)&&pw)out.push(['bad','✕','Digits only. A numbers-only password is cracked almost instantly.']);
   if(/(19|20)\d\d/.test(pw))out.push(['warn','!','Contains what looks like a year. Dates are among the first things guessed.']);
@@ -930,11 +936,6 @@ let exIdx=0;
 function fillExample(){pwField.value=EXAMPLES[exIdx%EXAMPLES.length];exIdx++;refresh();pwField.focus();}
 refresh();
 
-/* ---------------- brute-force animation ---------------- */
-let attackRAF=null;
-const CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
-function randStr(len){let s='';for(let i=0;i<len;i++)s+=CHARS[Math.floor(Math.random()*CHARS.length)];return s;}
-
 /* ---------------- demo passwords ---------------- */
 const DEMO=[
   ['Spring2024','Season + year, easy to remember'],
@@ -968,56 +969,56 @@ const EMAILS=[
     subj:'ACTION REQUIRED: Your mailbox will be deactivated in 24 hours',
     body:'Dear User,\n\nOur records indicate your account has exceeded its storage quota. To avoid deactivation within 24 hours, verify your credentials immediately:\n\n[ Re-validate my account ]  https://ubc-secure-login.net/verify\n\nFailure to act will result in permanent loss of access.\n\nIT Service Desk',
     phish:true,
-    why:['The sender domain is <b>ubc-secure-login.net</b> — not a real university domain. Legitimate IT uses the institution\'s own domain.','Manufactured urgency: "24 hours" and "permanent loss" are designed to make you panic and click.','Generic greeting ("Dear User") instead of your name.','The link text and the real URL point to an outside site built to harvest your password.']
+    why:['The sender domain is <b>ubc-secure-login.net</b>, not a real university domain. Legitimate IT uses the institution\'s own domain.','Manufactured urgency: "24 hours" and "permanent loss" are designed to make you panic and click.','Generic greeting ("Dear User") instead of your name.','The link text and the real URL point to an outside site built to harvest your password.']
   },
   {
     name:'Payroll Services',addr:'payroll@myuniversity.edu',
     subj:'Your February direct deposit statement is available',
     body:'Hello,\n\nYour pay statement for the February 15 pay period is now available in the self-service portal.\n\nTo view it, log in to the portal directly from your bookmark or the staff homepage — we\'ll never ask you to enter your password from an email link.\n\nQuestions? Reply to this message or call the Payroll office at the number in the staff directory.\n\nPayroll Services',
     phish:false,
-    why:['The sender uses the real institutional domain.','It does <b>not</b> ask you to click a login link — it tells you to navigate to the portal yourself, which is exactly what safe senders do.','No urgency, no threats, and it points you to verify through known channels (the staff directory).']
+    why:['The sender uses the real institutional domain.','It does <b>not</b> ask you to click a login link. It tells you to navigate to the portal yourself, which is exactly what safe senders do.','No urgency, no threats, and it points you to verify through known channels (the staff directory).']
   },
   {
     name:'Dr. Patricia Vance',addr:'p.vance.registrar@gmail.com',
     subj:'Quick favor — are you at your desk?',
     body:'Hi,\n\nI\'m heading into back-to-back meetings and can\'t take calls. I need you to purchase four $200 gift cards for a donor appreciation event this afternoon. Send me the codes as soon as you have them and I\'ll approve reimbursement.\n\nKeep this between us for now — it\'s a surprise.\n\nSent from my iPhone\nPatricia',
     phish:true,
-    why:['A supervisor\'s name paired with a <b>personal gmail address</b>, not their work account — a classic impersonation setup.','Gift-card requests are almost never legitimate business processes.','"Keep this between us" isolates you so you can\'t verify with anyone.','Urgency plus unavailability ("can\'t take calls") prevents you from confirming by phone.']
+    why:['A supervisor\'s name paired with a <b>personal gmail address</b>, not their work account, a classic impersonation setup.','Gift-card requests are almost never legitimate business processes.','"Keep this between us" isolates you so you can\'t verify with anyone.','Urgency plus unavailability ("can\'t take calls") prevents you from confirming by phone.']
   },
   {
     name:'Office of the Registrar',addr:'no-reply@myuniversity.edu',
     subj:'Reminder: grade submission deadline is Friday',
     body:'Faculty and staff,\n\nThis is a reminder that final grades for the winter term are due by 5:00 PM this Friday.\n\nInstructions and the submission portal are linked from the faculty resources page on the staff intranet. If you need an extension, contact your department administrator.\n\nThank you,\nOffice of the Registrar',
     phish:false,
-    why:['Sent from the real institutional domain.','Routine, expected content with a deadline that matches the academic calendar — not artificial pressure.','It points to the intranet and a known human (your department admin) rather than an outside link.','No request for credentials or money.']
+    why:['Sent from the real institutional domain.','Routine, expected content with a deadline that matches the academic calendar, not artificial pressure.','It points to the intranet and a known human (your department admin) rather than an outside link.','No request for credentials or money.']
   },
   {
     name:'Student Records Portal',addr:'records@my-university-portal.com',
     subj:'FERPA compliance: re-confirm your access authorization',
     body:'Notice:\n\nAs part of an annual FERPA audit, all staff with access to student records must re-confirm their authorization within 48 hours.\n\nConfirm here: [ Verify FERPA access ]  http://my-university-portal.com/ferpa-auth\n\nUnconfirmed accounts will have record access suspended.\n\nCompliance Office',
     phish:true,
-    why:['Uses a real-sounding compliance topic (FERPA) to seem official — a common tactic against university staff.','Domain <b>my-university-portal.com</b> is a look-alike, not the institution\'s domain, and the link is plain <b>http</b>, not secure https.','48-hour deadline plus a threat to suspend access = pressure to act without thinking.','Real compliance re-certifications go through official internal systems, not emailed links.']
+    why:['Uses a real-sounding compliance topic (FERPA) to seem official, a common tactic against university staff.','Domain <b>my-university-portal.com</b> is a look-alike, not the institution\'s domain, and the link is plain <b>http</b>, not secure https.','48-hour deadline plus a threat to suspend access = pressure to act without thinking.','Real compliance re-certifications go through official internal systems, not emailed links.']
   },
   {
     name:'Marcus Bell',addr:'m.bell@myuniversity.edu',
     subj:'Re: transcript request for transfer student',
     body:'Hi,\n\nFollowing up on the transfer applicant we discussed at Tuesday\'s meeting — could you send over the official transcript when you get a chance? The student\'s ID is in the shared tracking sheet.\n\nNo rush, sometime this week is fine.\n\nThanks,\nMarcus',
     phish:false,
-    why:['From a colleague on the real institutional domain.','References a specific shared context ("Tuesday\'s meeting," "the shared tracking sheet") that an outsider wouldn\'t know.','Relaxed timeline — "no rush" — the opposite of phishing\'s manufactured urgency.','No links, no credential requests. If anything felt off, you could still confirm with Marcus directly.']
+    why:['From a colleague on the real institutional domain.','References a specific shared context ("Tuesday\'s meeting," "the shared tracking sheet") that an outsider wouldn\'t know.','Relaxed timeline ("no rush"), the opposite of phishing\'s manufactured urgency.','No links, no credential requests. If anything felt off, you could still confirm with Marcus directly.']
   },
   {
     name:'Benefits Enrollment',addr:'hr-benefits@myuniversity-hr.co',
     subj:'You have an unclaimed tuition reimbursement of $1,480',
     body:'Congratulations,\n\nOur system shows you have an UNCLAIMED tuition reimbursement of $1,480.00 waiting to be processed.\n\nTo release your funds, confirm your banking details within 3 business days:\n\n[ Claim my reimbursement ]\n\nHR Benefits Team',
     phish:true,
-    why:['Too-good-to-be-true "unclaimed money" is a lure to get you to act quickly.','Domain <b>myuniversity-hr.co</b> is a look-alike of the real one (note the odd .co and extra "-hr").','Asks you to "confirm banking details" from an email — legitimate HR never collects bank info this way.','Deadline pressure ("3 business days") again rushes your judgment.']
+    why:['Too-good-to-be-true "unclaimed money" is a lure to get you to act quickly.','Domain <b>myuniversity-hr.co</b> is a look-alike of the real one (note the odd .co and extra "-hr").','Asks you to "confirm banking details" from an email. Legitimate HR never collects bank info this way.','Deadline pressure ("3 business days") again rushes your judgment.']
   },
   {
     name:'Facilities Notice',addr:'facilities@myuniversity.edu',
     subj:'Planned power maintenance — Admin Building, Saturday',
     body:'All staff,\n\nPlease be aware of scheduled electrical maintenance in the Administration Building this Saturday from 6:00 AM to 10:00 AM. Systems in that building, including networked printers, may be briefly unavailable.\n\nNo action is required on your part. Details are posted on the facilities page of the staff intranet.\n\nFacilities Management',
     phish:false,
-    why:['Real institutional domain and a mundane, plausible operational notice.','Explicitly states "no action is required" — it isn\'t trying to get you to do anything.','No links to click, no credentials or payment requested.','Points to the intranet for details, consistent with how internal notices actually work.']
+    why:['Real institutional domain and a mundane, plausible operational notice.','Explicitly states "no action is required." It isn\'t trying to get you to do anything.','No links to click, no credentials or payment requested.','Points to the intranet for details, consistent with how internal notices actually work.']
   }
 ];
 let reviewed=0;const answered=new Array(EMAILS.length).fill(false);
@@ -1053,7 +1054,7 @@ function answer(i,guessPhish,btn){
   rev.classList.add('show');
   const cls=e.phish?'is-phish':'is-legit';
   const verdict=e.phish?'This is phishing':'This is legitimate';
-  const head=correct?'✓ Correct — ':'✕ Not quite — ';
+  const head=correct?'✓ Correct: ':'✕ Not quite: ';
   rev.innerHTML='<div class="reveal-inner '+cls+'">'+
     '<div class="reveal-verdict">'+head+verdict+'</div>'+
     '<div style="font-size:13.5px;color:var(--ink-soft);margin-bottom:4px">The tells:</div>'+
@@ -1079,28 +1080,28 @@ const STEPS=[
   {
     kicker:'Step 1 · The account falls',
     title:'One click hands over the keys',
-    body:'A coworker clicks a link that looks like it came from someone they trust and enters their password — or approves a multi-factor prompt they didn\'t start. In under an hour, an attacker controls their account. Nothing looks broken. The coworker may not even know yet.',
+    body:'A coworker clicks a link that looks like it came from someone they trust and enters their password, or approves a multi-factor prompt they didn\'t start. In under an hour, an attacker controls their account. Nothing looks broken. The coworker may not even know yet.',
     source:['Documented','UNC School of Medicine, Feb. 2024: an employee clicked a phishing link sent from a known, trusted contact and shared their MFA code. The attacker was inside the email account within the hour.'],
     nodes:['a'],edges:[]
   },
   {
     kicker:'Step 2 · The inbox is a master key',
     title:'Email unlocks almost everything else',
-    body:'A work inbox isn\'t just messages — it\'s the reset button for every other system. "Forgot password?" links land there. With the inbox, the attacker can quietly take over connected apps one by one, without ever guessing another password.',
+    body:'A work inbox isn\'t just messages; it\'s the reset button for every other system. "Forgot password?" links land there. With the inbox, the attacker can quietly take over connected apps one by one, without ever guessing another password.',
     source:['Documented','FBI IC3, 2024: an email account is the hub of a professional\'s digital life. Stolen email credentials let attackers reach nearly every other account through password resets.'],
     nodes:['a','b'],edges:['e-ab']
   },
   {
     kicker:'Step 3 · The phish spreads sideways',
     title:'Now the scam comes from a real colleague',
-    body:'The attacker emails the rest of the office from the compromised — and completely genuine — internal address. Coworkers have no reason to doubt it. Each person who clicks becomes the next compromised account, and the circle widens.',
+    body:'The attacker emails the rest of the office from the compromised, completely genuine, internal address. Coworkers have no reason to doubt it. Each person who clicks becomes the next compromised account, and the circle widens.',
     source:['Documented','This is exactly how the UNC case began: the malicious link arrived from an already-trusted contact. Boise State (2024–25) saw multiple staff fall for phishing that then altered direct-deposit details.'],
     nodes:['a','b','c'],edges:['e-ab','e-ac']
   },
   {
     kicker:'Step 4 · The data trove opens',
     title:'The attacker inherits every permission the account had',
-    body:'A compromised account keeps all of its legitimate access. Shared mailboxes, student records, financial aid files, network drives — whatever that coworker could open, the attacker can now open too. One ordinary employee\'s login can expose the entire archive.',
+    body:'A compromised account keeps all of its legitimate access. Shared mailboxes, student records, financial aid files, network drives, whatever that coworker could open, the attacker can now open too. One ordinary employee\'s login can expose the entire archive.',
     source:['Documented','Princeton, Nov. 2025: one phished employee with routine database access exposed alumni, donor, and student records. PowerSchool (2024): stolen subcontractor credentials reached data on tens of millions of students.'],
     nodes:['a','b','c','d'],edges:['e-ab','e-ac','e-bd','e-cd']
   },
@@ -1108,13 +1109,13 @@ const STEPS=[
     kicker:'Step 5 · The money moves',
     title:'Impersonation turns access into theft',
     body:'Wearing the trusted account like a mask, the attacker redirects a paycheck\'s direct deposit, changes vendor banking details, or asks a colleague to approve a payment. Because the request comes from a real coworker, it often works.',
-    source:['Documented','FBI IC3, 2024: business email compromise drove about $2.77 billion in reported losses across 21,442 complaints — frequently through compromised accounts and redirected payroll or vendor payments.'],
+    source:['Documented','FBI IC3, 2024: business email compromise drove about $2.77 billion in reported losses across 21,442 complaints, frequently through compromised accounts and redirected payroll or vendor payments.'],
     nodes:['a','b','c','d','e'],edges:['e-ab','e-ac','e-bd','e-cd','e-be','e-ce']
   },
   {
     kicker:'Step 6 · Everyone pays',
     title:'One click, a whole institution in the blast radius',
-    body:'Breach notifications go out. Credit monitoring is offered. FERPA and privacy obligations kick in. There\'s cleanup cost, lost time, and lasting damage to trust — landing on people who never clicked anything. The blast radius of one account is the entire office.',
+    body:'Breach notifications go out. Credit monitoring is offered. FERPA and privacy obligations kick in. There\'s cleanup cost, lost time, and lasting damage to trust, landing on people who never clicked anything. The blast radius of one account is the entire office.',
     source:['Documented','Columbia University, 2025: roughly 870,000 people\'s data, including Social Security numbers, was exposed. Total U.S. cybercrime losses in 2024 hit a record $16.6 billion, up 33% in a single year.'],
     nodes:['a','b','c','d','e','f'],edges:['e-ab','e-ac','e-bd','e-cd','e-be','e-ce','e-df','e-ef']
   }
@@ -1138,7 +1139,6 @@ function renderDots(){
   STEPS.forEach((_,i)=>{const i2=document.createElement('i');d.appendChild(i2);});
 }
 function paintBlast(){
-  // reset
   NODES.forEach(n=>{const el=document.getElementById('node-'+n.id);el.setAttribute('class','node-box pending');});
   document.querySelectorAll('#blastEdges .edge').forEach(e=>e.classList.remove('hot'));
   const btn=document.getElementById('blastNext');
@@ -1147,7 +1147,7 @@ function paintBlast(){
     NODES.forEach(n=>{const el=document.getElementById('node-'+n.id);el.setAttribute('class','node-box safe');});
     document.getElementById('blastStepKicker').textContent='Step 0 · Before the click';
     document.getElementById('blastStepTitle').textContent='One ordinary account, one ordinary day';
-    document.getElementById('blastStepBody').textContent='Everyone in the office has legitimate access to something — an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button to trace what happens after one coworker clicks the wrong link.';
+    document.getElementById('blastStepBody').textContent='Everyone in the office has legitimate access to something: an inbox, a shared drive, student records, a payments system. That access is exactly what makes a single account worth stealing. Press the button to trace what happens after one coworker clicks the wrong link.';
     document.getElementById('blastStepSource').style.display='none';
     explain.classList.add('safe-state');
     btn.textContent='▶ Trace the first hop';btn.disabled=false;
@@ -1165,7 +1165,6 @@ function paintBlast(){
     if(blastStep>=STEPS.length){btn.textContent='Spread complete';btn.disabled=true;}
     else{btn.textContent='▶ Next hop';btn.disabled=false;}
   }
-  // dots
   const dots=[...document.querySelectorAll('#blastDots i')];
   dots.forEach((d,i)=>{d.className='';if(i<blastStep-1)d.classList.add('done');else if(i===blastStep-1)d.classList.add('current');});
 }
