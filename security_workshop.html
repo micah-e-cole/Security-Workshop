@@ -83,7 +83,44 @@
     background:var(--card);border:1px solid var(--line);border-radius:14px;
     padding:22px;box-shadow:var(--shadow);
   }
-
+  /* ---- password info ---- */
+  /* fixed-height frame keeps both stages aligned regardless of image ratio */
+  .spud {
+  display: flex;
+  align-items: center;   /* vertical alignment */
+  justify-content: center; /* optional: center horizontally */
+  gap: 16px;             /* spacing between items */
+  flex-wrap: wrap;       /* prevents overflow on small screens */
+  }
+  .spud-art{
+    height:200px;                 /* ← the one number to tune */
+    width: 150px;
+    margin:0 auto 12px;
+    display:flex;align-items:center;justify-content:center;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    overflow:hidden;
+  }
+  .spud-art img{
+    max-height:100%;max-width:100%;
+    width:auto;height:auto;
+    object-fit:contain;           /* whole image visible, never cropped */
+    display:block;
+  }
+  .spud-arrow{
+  flex:0 0 auto;
+  padding:0 14px;
+  align-self:flex-start;
+  height:130px;                /* same as .spud-art */
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;      /* vertically centered, no magic number */
+  margin-top:0;
+  font-family:'Helvetica',monospace;font-size:13px;font-weight:700;
+  color:var(--rudy);text-align:center;letter-spacing:.06em;
+}
   /* ---- password lab ---- */
   .pw-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
   .pw-input{
@@ -262,10 +299,9 @@
   <button class="tab" role="tab" aria-selected="false" aria-controls="p-blast" id="t-blast">Blast Radius</button>
   <button class="tab" role="tab" aria-selected="false" aria-controls="p-recap" id="t-recap">Takeaways</button>
 </nav>
-
 <main>
   <!-- INTRO -->
-  <div class="panel" id="p-intro" role="tabpanel" aria-labelledby="t-intro">
+  <div class="panel active" id="p-intro" role="tabpanel" aria-labelledby="t-intro">
     <p class="lede">Most breaches don't start with a genius hacker. They start with a reused password or one clicked link. This session has two labs and an informational section; work through them as a group.</p>
     <section class="block">
       <div class="card">
@@ -282,7 +318,6 @@
             <p style="margin:0;color:var(--ink-soft);font-size:14.5px">Triage emails styled after real messages that could come to your inbox. Flag each as safe or a scam, then see the tells you might have missed.</p>
           </div>
         </div>
-        <!-- <div class="facil"><b>Facilitator note</b><br>Give the room 2 minutes on the Password Lab intro before revealing the brute-force demo together on the projector. It lands hardest as a shared "oh no" moment.</div> -->
       </div>
     </section>
     <section class="block">
@@ -291,117 +326,293 @@
         <div class="feedback">
           <div class="fb good"><span class="ic">✓</span><span><b>Use fake passwords.</b> Never type a password you actually use, here or anywhere you're asked to "test" it. Make something up.</span></div>
           <div class="fb good"><span class="ic">✓</span><span><b>Nothing is stored.</b> This page runs entirely in your browser. Close the tab and it's gone.</span></div>
-          <div class="fb warn"><span class="ic">!</span><span><b>The crack times are estimates.</b> They assume a fast offline attack (~100 billion guesses/second). Real conditions vary, but the comparisons hold.</span></div>
+          <div class="fb warn"><span class="ic">!</span><span><b>The crack times are estimates.</b> They assume a fast offline attack (~100 billion guesses/second).</span></div>
         </div>
         <div style="margin-top:20px"><button class="btn" onclick="showTab('passinfo')">Start →</button></div>
       </div>
     </section>
   </div>
-  <!-- Passwords Information -->
-  <div class="panel active" id="p-passinfo" role="tabpanel" aria-labelledby="t-passinfo">
-    <p class="kicker">Information</p>
+<!-- Passwords Information -->
+  <div class="panel" id="p-passinfo" role="tabpanel" aria-labelledby="t-passinfo">
     <h2 class="blocktitle" style="font-size:28px">Passwords: It's (Almost) All Math</h2>
+    <!-- ─────────── PART ONE ─────────── -->
     <section class="block">
-      <!-- <div class="callout" style="background-color: var(--rudy);"> -->
-        <p>A password of any given length (<b><mi>L</mi></b>) built using a character set of size (<b><mi>N</mi></b> - which represents complexity) creates a combination of posibilities where: 
-          <br>
-          <br>
-          <math display="block">
-            <mi>Possible Combinations</mi>
-            <mo>=</mo>
-            <msup>
-            <mi>N</mi>
-            <mi>L</mi>
-            </msup>
-            </math>
-            <br>
-          As the English alphabet contains 26 characters, if we have a password length of 8 alphabetical characters (only including lowercase letters) then the complexity becomes:
-           <br>
-           <br>
-          <math display="block">
-            <mi>Possible Combinations</mi>
-            <mo>=</mo>
-            <msup>
-            <mi>26</mi>
-            <mi>8</mi>
-            </msup>
-            <mo>=</mo>
-            <mi>208,827,064,576</mi>
-            </math>
-            <br>
-          The mathematical expression explains why password <i>length</i> and not simply <i>complexity</i> make the biggest impact. Complexity is the base and password length is the exponent. 
-          <br><br>
-          The following table exemplifies how simply changing complexity will affect the possible combinations for a password with a length of 8 characters:
-          <br>
-          <table>
-          <!-- Row 1: Headers -->
-          <tr>
-            <th>Characters (Length = 8)</th>
-            <th>Complexity (N)</th>
-            <th>Possible Combinations</th>
-            <th></th>
-          </tr>
-          <!-- Row 2: Data -->
-          <tr>
-            <td>Lowercase letters only</td>
-            <td>26</td>
-            <td>208,827,064,576</td>
-          </tr>
-          <tr>
-            <td>Lowercase letters + Uppercase letters</td>
-            <td>52</td>
-            <td>53,459,728,531,456</td>
-          </tr>
-          <tr>
-            <td>Lowercase + Uppercase letters + Numbers</td>
-            <td>62</td>
-            <td>218,340,105,584,896</td>
-          </tr>
-          <tr>
-            <td>All letters + Numbers + Special Characters</td>
-            <td>~95</td>
-            <td>6,634,204,312,890,625</td>
-          </tr>
-        </table>
-        <br>
-        The addition of complexity does cause the number of possibilities to increase, however, not to the same magnitude as when we increase the length of the password:
+      <p class="kicker">Part One</p>
+      <h2 class="blocktitle" style="font-size:24px">The Math</h2>
+
+      <p>A password of any given length (<b>L</b>) built using a character set of size (<b>N</b> - which represents complexity) creates a combination of posibilities where:</p>
+
+      <math display="block">
+        <mi>Possible Combinations</mi>
+        <mo>=</mo>
+        <msup><mi>N</mi><mi>L</mi></msup>
+      </math>
+
+      <p>As the English alphabet contains 26 characters, if we have a password length of 8 alphabetical characters (only including lowercase letters) then the complexity becomes:</p>
+
+      <math display="block">
+        <mi>Possible Combinations</mi>
+        <mo>=</mo>
+        <msup><mi>26</mi><mi>8</mi></msup>
+        <mo>=</mo>
+        <mi>208,827,064,576</mi>
+      </math>
+
+      <p>The mathematical expression explains why password <i>length</i> and not simply <i>complexity</i> make the biggest impact. Complexity is the base and password length is the exponent.</p>
+
+      <p>The following table exemplifies how simply changing complexity will affect the possible combinations for a password with a length of 8 characters:</p>
+
+      <table>
+        <tr>
+          <th>Characters (Length = 8)</th>
+          <th>Complexity (N)</th>
+          <th>Possible Combinations</th>
+        </tr>
+        <tr>
+          <td>Lowercase letters only</td>
+          <td>26</td>
+          <td>208,827,064,576</td>
+        </tr>
+        <tr>
+          <td>Lowercase letters + Uppercase letters</td>
+          <td>52</td>
+          <td>53,459,728,531,456</td>
+        </tr>
+        <tr>
+          <td>Lowercase + Uppercase letters + Numbers</td>
+          <td>62</td>
+          <td>218,340,105,584,896</td>
+        </tr>
+        <tr>
+          <td>All letters + Numbers + Special Characters</td>
+          <td>~95</td>
+          <td>6,634,204,312,890,625</td>
+        </tr>
+      </table>
+
+      <p><br>The addition of complexity does cause the number of possibilities to increase, however, not to the same magnitude as when we increase the length of the password:</p>
+
+      <table>
+        <tr>
+          <th>Characters (Lowercase only)</th>
+          <th>Possible Combinations</th>
+        </tr>
+        <tr>
+          <td>8</td>
+          <td>208,827,064,576</td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>141,167,095,653,376</td>
+        </tr>
+        <tr>
+          <td>12</td>
+          <td>95,428,956,661,682,176</td>
+        </tr>
+        <tr>
+          <td>16</td>
+          <td>43,608,742,899,428,874,059,776</td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- ─────────── PART TWO ─────────── -->
+    <section class="block">
+      <p class="kicker">Part Two</p>
+      <h2 class="blocktitle" style="font-size:24px">What Is Actually Stored</h2>
+
+      <p>When you type your password into a website, what does that website keep?
         <br><br>
-          <table>
-          <!-- Row 1: Headers -->
-          <tr>
-            <th>Characters (Lowercase only)</th>
-            <th>Possible Combinations</th>
-          </tr>
-          <!-- Row 2: Data -->
-          <tr>
-            <td>8</td>
-            <td>208,827,064,576</td>
-          </tr>
-          <tr>
-            <td>10</td>
-            <td>141,167,095,653,376</td>
-          </tr>
-          <tr>
-            <td>12</td>
-            <td>95,428,956,661,682,176</td>
-          </tr>
-          <tr>
-            <td>16</td>
-            <td>43,608,742,899,428,874,059,776</td>
-          </tr>
-        </table>
-        </p>
+        A well-built system <b>never stores your password</b>. It stores a <b>hash</b> of your password.
+      </p>
+
+      <h3>What's a Hash?</h3>
+
+      <div class="spud">
+        <div class="spud-stage">
+          <div class="spud-art">
+            <img src="images/potato.jpg" alt="A single raw potato, whole and unpeeled">
+          </div>
+        </div>
+        <div class="spud-arrow">
+          <span class="glyph">→</span>
+          shred &amp; fry
+        </div>
+        <div class="spud-stage">
+          <div class="spud-art">
+            <img src="images/hashbrown.jpg" alt="A cooked hashbrown, shredded and fried golden brown">
+          </div>
+        </div>
+      </div>
+
+      <div class="spud-back">
+        If we start with a Yukon Gold potato that is about the size of a fist and has a brown spot on the left side, put that potato through physical hashing (turning it into a hashbrown) the person eating that hashbrown has no way of taking the parts of the hashbrown and reconstructing the same potato exactly as it was. This is the idea behind password hashing.
+      </div>
+
+      <p><br>The system takes your password, runs it through a hashing process, and stores what comes out: a fixed-length string of characters that reveals nothing about what went in.
+        This breaks down in the real-world because we can obviously make hashbrowns without knowing what variety of potatoes were used, their size, and characteristics do not matter. With passwords, the details (characters used, length) all matter and are part of the hashing process.
+        <br><br>
+        Here is that consistency in real numbers. These are actual Secure Hash Algorithm 256-bit (SHA-256) hashes:
+      </p>
+
+      <table>
+        <tr>
+          <th>What is typed (the potato)</th>
+          <th>What the system stores (the hashbrown)</th>
+        </tr>
+        <tr>
+          <td class="mono">password</td>
+          <td class="mono" style="font-size:12px;word-break:break-all">5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8</td>
+        </tr>
+        <tr>
+          <td class="mono">Password</td>
+          <td class="mono" style="font-size:12px;word-break:break-all">e7cf3ef4f17c3999a94f2c6f612e8a888e5b1026878e4e19398b23bd38ec221a</td>
+        </tr>
+        <tr>
+          <td class="mono">password1</td>
+          <td class="mono" style="font-size:12px;word-break:break-all">0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e</td>
+        </tr>
+      </table>
+
+      <p><br>One letter changed from lowercase to uppercase, and the output is unrecognizable. There is no partial credit and no getting warmer. Note also that every hashbrown is exactly the same size, no matter how big the potato was.
+        <br><br>
+        <b>So how does logging in work?</b> When you set your password, the system shreds it and files away the hash of your password. When you come back and type your password, the system shreds what you just typed and compares the two hashes. If they match, you are in.
+        The system verified your password <i>without ever knowing what it was</i>. It only ever had the hash.
+      </p>
+
+      <div class="griddle">
+        <h3>In The Wild</h3>
+        <p>A breach does not hand an attacker your password. It hands them a database of hashes (usually millions of them when major compromises occur).</p>
+        <p><span class="hot">The attackers do not have your password, </span> but they now have something to test against.</p>
+        <p>That is what "cracking a password" actually means. It is guessing, at enormous speed, against a stolen file. And because the attacker works offline on their own hardware, there is nothing to slow them down: no login page, no lockout after three tries, no delay. Just a graphics card working as fast as it physically can on the order of <b>billions to hundreds of billions per second</b> (depending on the hardware and hashing algorithms used).</p>
+        <p>Which brings us straight back to Part One. The only thing standing between an attacker and your password is <b>how many hashes they have to try</b>. Unfortunately, math is really important.</p>
       </div>
     </section>
-    <section class="block">
 
+    <!-- ─────────── PART THREE ─────────── -->
+    <section class="block">
+      <p class="kicker">Part Three</p>
+      <h2 class="blocktitle" style="font-size:24px">How the Guessing Actually Happens</h2>
+
+      <p>Attackers do not guess randomly, and they do not guess in the order you would expect. There are three classic strategies, tried roughly in order of how cheap they are.</p>
+
+      <h3><br>1. Brute Force: Try Everything, In Order</h3>
+
+      <p>The unsubtle approach. Start at <span class="mono">aaaaaaaa</span>, hash it, compare. Then <span class="mono">aaaaaaab</span>. Then <span class="mono">aaaaaaac</span>. Continue through every combination the character set allows until something matches.
+        <br><br>
+        There is no cleverness here at all — only speed. A single modern graphics card makes billions of guesses per second, and a purpose-built rig reaches roughly 100 billion per second against a fast hash. That is the number the Password Lab uses.
+        <br><br>
+        Brute force is the attack that the N<sup>L</sup> math from Part One defeats directly. Every character you add multiplies the attacker's work by the size of the character set, <i>exponentially</i>. This is why the 16-character row in that first table is roughly 200 billion times larger than the 8-character row. Past about 16 characters, exhaustive guessing stops being worth attempting — the universe is not old enough.
+      </p>
+
+      <div class="feedback">
+        <div class="fb good"><span class="ic">✓</span><span><b>What defeats it:</b> length. Nothing else, and nothing else is needed.</span></div>
+      </div>
+
+      <h3><br>2. Dictionary Attack: Try What People Actually Pick</h3>
+
+      <p>This is the attack that breaks most real passwords, and it is the reason Part One is only <i>almost</i> the whole story.
+        <br><br>
+        Brute force treats every 8-character string as equally likely. But people do not pick random strings — they pick words. So instead of counting up from <span class="mono">aaaaaaaa</span>, the attacker starts with a list: dictionary words, names, sports teams, cities, and most damaging of all, hundreds of millions of real passwords harvested from previous breaches.
+        <br><br>
+        Then the software applies <b>rules</b>, automatically: capitalize the first letter. Append a year. Append an exclamation mark. Swap <span class="mono">a</span> for <span class="mono">@</span>, <span class="mono">o</span> for <span class="mono">0</span>, <span class="mono">i</span> for <span class="mono">1</span>. Try every combination of those.
+        <br><br>
+        Here is the uncomfortable part. <span class="mono">P@ssw0rd!</span> feels clever. To a cracking tool it is <i>one dictionary word plus three rules the software already knows</i>. It is not a needle in a haystack. It is near the top of the list.
+        <br><br>
+        Compare two passwords of identical length and identical character variety:
+      </p>
+
+      <table>
+        <tr>
+          <th>Password</th>
+          <th>Length</th>
+          <th>Guesses actually needed</th>
+        </tr>
+        <tr>
+          <td class="mono">Redhawks1</td>
+          <td>9</td>
+          <td>A few thousand <span class="pill instant">falls instantly</span></td>
+        </tr>
+        <tr>
+          <td class="mono">q7Wm#kZ2p</td>
+          <td>9</td>
+          <td>Roughly 570 trillion <span class="pill weak">holds for a while</span></td>
+        </tr>
+      </table>
+
+      <p><br>Same length. Same character sets. Wildly different outcomes — because one lives in a search space of thousands and the other lives in a search space of trillions. <b>Length only protects you when the attacker has to search the whole space.</b></p>
+
+      <div class="feedback">
+        <div class="fb good"><span class="ic">✓</span><span><b>What defeats it:</b> unpredictability, not decoration. Symbol substitutions buy you almost nothing. A passphrase of unrelated words — <span class="mono">copper-lantern-breeze-moss</span> — is long <i>and</i> unguessable, which is the combination that works.</span></div>
+      </div>
+
+      <h3><br>3. Rainbow Table: Do the Work Once, Look It Up Forever</h3>
+
+      <p>Hashing takes time. If an attacker is going to crack thousands of stolen hashes, why hash the word <span class="mono">password</span> over and over for each one?
+        <br><br>
+        They do not. They compute the hashes for millions of likely passwords <i>in advance</i>, store the results in an enormous precomputed lookup structure, and then simply look up each stolen hash to see which password produced it. Cracking stops being a computation and becomes a lookup — and a lookup is close to instantaneous.
+        <br><br>
+        This works precisely because hashing is deterministic. The word <span class="mono">password</span> hashes to <span class="mono">5e884898…</span> on every system on earth, forever. The same potato always makes the same hashbrown. Which means a table built years ago still works against a database stolen tomorrow.
+      </p>
+
+      <p><br><b>The countermeasure is salting.</b> A <b>salt</b> is a unique random value the system adds to your password before hashing it. If your salt is <span class="mono">x7f2</span>, the system does not hash <span class="mono">password</span> — it hashes <span class="mono">passwordx7f2</span>, producing an entirely different hash.
+        <br><br>
+        In kitchen terms: every account gets its own secret seasoning mixed in before shredding. Two employees who both chose <span class="mono">password</span> now have completely different stored hashes. Every precomputed table in the world becomes useless, because none of them were built with your salt. The attacker is forced back to guessing one password at a time — right back into the math from Part One.
+      </p>
+
+      <div class="feedback">
+        <div class="fb warn"><span class="ic">!</span><span><b>What defeats it:</b> salting — but that is the <i>system's</i> job, not yours. You cannot salt someone else's database, and plenty of older systems never bothered. What you control is blast radius: if that unsalted forum from 2014 gets breached, a unique password means it costs you one account instead of all of them.</span></div>
+      </div>
+
+      <h3><br>And One That Needs No Cracking At All</h3>
+
+      <p><b>Credential stuffing.</b> An attacker takes an email and password that already leaked from one breached site and simply tries the pair on a hundred others. Nothing is guessed. Nothing is reversed. No hash is broken. The password is just <i>correct</i>.
+        <br><br>
+        Against this, password strength is <b>completely irrelevant</b>. Your strongest possible password is defeated the moment you use it in two places. Only uniqueness helps — and multi-factor authentication, which stops the attacker even when the password is right.
+      </p>
+
+      <h3><br>Putting It Together</h3>
+      <p>No single habit defends against all four. This is why the advice is a short list rather than one rule.</p>
+
+      <table>
+        <tr>
+          <th>Attack</th>
+          <th>What it beats</th>
+          <th>What defeats it</th>
+        </tr>
+        <tr>
+          <td><b>Brute force</b></td>
+          <td>Short passwords, however complex</td>
+          <td><span class="pill ok">Length — 16+ characters</span></td>
+        </tr>
+        <tr>
+          <td><b>Dictionary</b></td>
+          <td>Words, names, dates, symbol swaps</td>
+          <td><span class="pill ok">Unpredictability</span></td>
+        </tr>
+        <tr>
+          <td><b>Rainbow table</b></td>
+          <td>Unsalted databases, reused passwords</td>
+          <td><span class="pill ok">Salting + uniqueness</span></td>
+        </tr>
+        <tr>
+          <td><b>Credential stuffing</b></td>
+          <td>Any password used more than once</td>
+          <td><span class="pill ok">Uniqueness + MFA</span></td>
+        </tr>
+      </table>
     </section>
-    </div>
+
+    <section class="block">
+      <div style="margin-top:20px"><button class="btn" onclick="showTab('pw')">Next →</button></div>
+    </section>
+  </div>
+
   <!-- PASSWORD LAB -->
   <div class="panel" id="p-pw" role="tabpanel" aria-labelledby="t-pw">
     <p class="kicker">Lab 1</p>
     <h2 class="blocktitle" style="font-size:28px">Password Lab</h2>
-    <p class="lede">Type a made-up password below. The meter updates as you type. When you're ready, run the attacker simulation.</p>
+    <p class="lede">Type a made-up password below and see how it stands up to password cracking.</p>
 
     <section class="block">
       <div class="card">
@@ -435,43 +646,19 @@
         <div class="feedback" id="pwFeedback"></div>
       </div>
     </section>
-
-    <section class="block">
-      <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:6px">
-          <h3 style="margin:0;font-size:19px">Attacker simulation</h3>
-          <button class="btn" id="runBtn" onclick="runAttack()">▶ Run brute-force attack</button>
-        </div>
-        <p style="margin:6px 0 0;color:var(--muted);font-size:14px">A visual of an attacker guessing, throttled so you can watch. Weak passwords fall in the blink of an eye. Strong ones stall the machine for longer than the universe has existed.</p>
-        <div class="console" aria-live="polite">
-          <div class="console-top">
-            <span class="console-title">guess_engine // offline attack</span>
-            <span class="dots"><i style="background:#FF6B5E"></i><i style="background:#F5C451"></i><i style="background:#6FE3A5"></i></span>
-          </div>
-          <div class="console-stream mono" id="stream">idle — enter a password and press run</div>
-          <div class="console-meta">
-            <span>attempts: <b id="attempts">0</b></span>
-            <span>rate: <b>~100B/sec</b></span>
-            <span>elapsed: <b id="elapsed">0.0s</b></span>
-          </div>
-          <div class="console-result" id="attackResult"></div>
-        </div>
-      </div>
-    </section>
-
     <section class="block">
       <p class="kicker">Compare</p>
-      <h3 style="margin:0 0 4px;font-size:19px">How common staff passwords hold up</h3>
-      <p style="margin:0 0 14px;color:var(--muted);font-size:14px">Dummy accounts with the kinds of passwords people actually pick. Notice what "adding a number and a capital" really buys you.</p>
+      <h3 style="margin:0 0 4px;font-size:19px">How common passwords hold up</h3>
+      <p style="margin:0 0 14px;color:var(--muted);font-size:14px">Fake accounts with the kinds of passwords people might actually pick. Notice what "adding a number and a capital" really buys you.</p>
       <div class="card" style="padding:6px 8px">
         <table>
-          <thead><tr><th>Account (demo)</th><th>Password</th><th>Why it's tempting</th><th>Time to crack</th></tr></thead>
+          <thead><tr><th>Password</th><th>Why it's tempting</th><th>Time to crack</th></tr></thead>
           <tbody id="demoRows"></tbody>
         </table>
       </div>
-      <div class="facil"><b>Discussion prompt</b><br>Ask the room: how many of these patterns look familiar? The point isn't shame — it's that attackers know these patterns too, and try them first.</div>
+      <!-- <div class="facil"><b>Discussion prompt</b><br>Ask the room: how many of these patterns look familiar? The point isn't shame — it's that attackers know these patterns too, and try them first.</div> -->
     </section>
-    <div><button class="btn" onclick="showTab('phish')">Continue to Lab 2 →</button></div>
+    <div><button class="btn" onclick="showTab('phish')">Next →</button></div>
   </div>
 
   <!-- PHISHING -->
@@ -583,9 +770,64 @@
         </ul>
       </div>
     </section>
-    <div class="facil"><b>Close the session</b><br>Have each person name one habit they'll change this week. Saying it out loud makes it stick.</div>
-    <p class="foot">Locksmith · a workshop prop · no data leaves this browser</p>
+    <section class="block">
+      <p class="kicker">Additional Resources</p>
+      <h2 class="blocktitle" style="font-size:24px">Where to Learn More</h2>
+      <div class="card">
+        <div class="feedback">
+          <div class="fb good">
+            <span class="ic">1</span>
+            <span><b><a href="https://redhawks.sharepoint.com/sites/Intranet-ITS/SitePages/InformationSecurity.aspx" target="_blank" rel="noopener" style="color:inherit">Seattle University IT Services</a></b><br>
+            Information regarding University Security Policies, awareness programs, cybersecurity guides, and who to contact if you suspect a data compromise.</span>
+          </div>
+          <div class="fb good">
+            <span class="ic">2</span>
+            <span><b>Get a password manager</b><br>
+            There are many free and paid options out there.</span>
+          </div>
+          <div class="fb good">
+            <span class="ic">3</span>
+            <span><b>Turn on multi-factor authentication everywhere it is offered</b><br>
+            Start with your email account, since that is the master key to everything else. An app-based code (Microsoft Authenticator, Duo, Authy) is meaningfully stronger than a text message. This stops an attacker even when they have your correct password.</span>
+          </div>
+        </div>
+      </div>
+
+      <h3><br>Understanding Passwords</h3>
+
+      <div class="card">
+        <div class="feedback">
+          <div class="fb warn">
+            <span class="ic">→</span>
+            <span><b><a href="https://www.eff.org/dice" target="_blank" rel="noopener" style="color:inherit">EFF — Dice-Generated Passphrases</a></b><br>
+            The Electronic Frontier Foundation's method for building a genuinely random, memorable passphrase using physical dice. This is where the four-word-passphrase advice comes from, with the math laid out.</span>
+          </div>
+          <div class="fb warn">
+            <span class="ic">→</span>
+            <span><b><a href="https://pages.nist.gov/800-63-3/sp800-63b.html" target="_blank" rel="noopener" style="color:inherit">NIST SP 800-63B — Digital Identity Guidelines</a></b><br>
+            The U.S. federal standard, and the reason modern guidance abandoned forced 90-day rotation and mandatory symbol rules. Dry reading, but it is the source nearly everything else cites. Section 5.1.1 covers passwords.</span>
+          </div>
+          <div class="fb warn">
+            <span class="ic">→</span>
+            <span><b><a href="https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html" target="_blank" rel="noopener" style="color:inherit">OWASP — Password Storage Cheat Sheet</a></b><br>
+            The developer's side of Part Two: how systems are <i>supposed</i> to hash and salt credentials, and what they get wrong. Read this if the hashbrowns made you curious about the kitchen.</span>
+          </div>
+        </div>
+      </div>
+
+      <h3><br>Phishing and Everyday Defense</h3>
+
+      <div class="card">
+        <div class="feedback">
+          <div class="fb warn">
+            <span class="ic">→</span>
+            <span><b><a href="https://www.ic3.gov" target="_blank" rel="noopener" style="color:inherit">FBI Internet Crime Complaint Center (IC3)</a></b><br>
+            Where real incidents get reported, and the source of the loss figures in the Blast Radius lab. Their annual report is the best free read on what is actually happening out there.</span>
+          </div>
+        </div>
+      </div>
   </div>
+    </section>
 </main>
 
 <script>
@@ -605,7 +847,7 @@ tabs.forEach(t=>t.addEventListener('click',()=>{
 /* ---------------- password analysis ---------------- */
 const COMMON=new Set(['password','password1','password123','123456','12345678','qwerty','letmein',
   'welcome','admin','iloveyou','abc123','football','monkey','dragon','sunshine','princess',
-  'spring2024','summer2024','fall2024','winter2024','registrar','husky','huskies','seattle']);
+  'spring2024','summer2024','fall2024','winter2024','registrar','redhawk','redhawks','seattle']);
 
 function analyze(pw){
   let pool=0;
@@ -692,63 +934,16 @@ refresh();
 let attackRAF=null;
 const CHARS='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
 function randStr(len){let s='';for(let i=0;i<len;i++)s+=CHARS[Math.floor(Math.random()*CHARS.length)];return s;}
-function runAttack(){
-  const pw=pwField.value;
-  const stream=document.getElementById('stream');
-  const result=document.getElementById('attackResult');
-  const attEl=document.getElementById('attempts');
-  const elEl=document.getElementById('elapsed');
-  const btn=document.getElementById('runBtn');
-  if(attackRAF){cancelAnimationFrame(attackRAF);attackRAF=null;}
-  result.className='console-result';result.textContent='';
-  if(!pw){stream.textContent='idle — enter a password and press run';return;}
-  const a=analyze(pw);
-  const willCrack=a.seconds<2; // demo: only "instant/near-instant" pws visibly fall
-  btn.disabled=true;btn.textContent='running…';
-  let attempts=0;const t0=performance.now();
-  const displayLen=Math.min(Math.max(pw.length,4),14);
-  function frame(now){
-    const realElapsed=(now-t0)/1000;
-    // show scrambling guesses
-    stream.textContent=randStr(displayLen);
-    attempts+=Math.floor(Math.random()*90000)+40000;
-    attEl.textContent=attempts.toLocaleString();
-    if(willCrack){
-      // simulated crack after ~1.4s of drama
-      if(realElapsed>1.4){
-        stream.textContent=pw;
-        elEl.textContent=humanTime(a.seconds);
-        result.className='console-result cracked';
-        result.textContent='✕ CRACKED — this password offered almost no protection.';
-        btn.disabled=false;btn.textContent='▶ Run brute-force attack';
-        return;
-      }
-      elEl.textContent=realElapsed.toFixed(1)+'s';
-    }else{
-      // strong: show the projected (astronomical) time and give up the visual
-      elEl.textContent=realElapsed.toFixed(1)+'s';
-      if(realElapsed>2.6){
-        stream.textContent='… still guessing …';
-        result.className='console-result safe';
-        result.textContent='◇ HOLDING — at this rate the attacker needs ~'+humanTime(a.seconds)+'. They give up.';
-        btn.disabled=false;btn.textContent='▶ Run brute-force attack';
-        return;
-      }
-    }
-    attackRAF=requestAnimationFrame(frame);
-  }
-  attackRAF=requestAnimationFrame(frame);
-}
 
-/* ---------------- demo accounts ---------------- */
+/* ---------------- demo passwords ---------------- */
 const DEMO=[
-  ['j.okafor','Spring2024','Season + year, easy to remember'],
-  ['m.delgado','Registrar1','Where they work + a "1"'],
-  ['t.nguyen','password123','The classic default'],
-  ['a.kowalski','Huskies!','School spirit + one symbol'],
-  ['s.abebe','Jennifer2011','A kid\'s name + birth year'],
-  ['r.santos','xK9#mvz@Lp2$rQ','Random, from a password manager'],
-  ['l.friedman','copper-lantern-breeze-moss','A four-word passphrase'],
+  ['Spring2024','Season + year, easy to remember'],
+  ['Registrar1','Where they work + a "1"'],
+  ['password123','The classic default'],
+  ['Redhawks!','School spirit + one symbol'],
+  ['Jennifer2011','A kid\'s name + birth year'],
+  ['xK9#mvz@Lp2$rQ','Random, from a password manager'],
+  ['copper-lantern-breeze-moss','A four-word passphrase'],
 ];
 function classify(sec){
   if(sec<60)return ['instant','instant'];
@@ -756,10 +951,12 @@ function classify(sec){
   return ['ok',humanTime(sec)];
 }
 const demoBody=document.getElementById('demoRows');
-DEMO.forEach(([u,p,why])=>{
-  const a=analyze(p);const [cls,txt]=classify(a.seconds);
+DEMO.forEach(([p,why])=>{
+  const a=analyze(p);
+  const [cls,txt]=classify(a.seconds);
   const tr=document.createElement('tr');
-  tr.innerHTML='<td class="mono">'+u+'</td><td class="pw">'+p+'</td><td style="color:var(--muted)">'+why+'</td>'+
+  tr.innerHTML='<td class="pw">'+p+'</td>'+
+    '<td style="color:var(--muted)">'+why+'</td>'+
     '<td><span class="pill '+cls+'">'+txt+'</span></td>';
   demoBody.appendChild(tr);
 });
